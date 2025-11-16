@@ -3,157 +3,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>А БАНК — Премиум банкинг</title>
+    <title>А БАНК — Онлайн банкинг</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app">
-        <div class="sidebar">
-            <div class="logo">
-                А БАНК <span class="dot">premium</span>
-            </div>
-            
-            <div id="userSummary" class="user-card">
-                <div id="greeting">Войдите в систему</div>
-                <div id="smallInfo" class="muted">Премиум банкинг 24/7</div>
-            </div>
-
-            <div id="nav" style="display: none;">
-                <button class="nav-button" data-action="dashboard">
-                    <span class="nav-icon">📊</span>
-                    <span class="nav-text">Дашборд</span>
-                </button>
-                <button class="nav-button" data-action="transfer">
-                    <span class="nav-icon">💸</span>
-                    <span class="nav-text">Переводы</span>
-                </button>
-                <button class="nav-button" data-action="card">
-                    <span class="nav-icon">💳</span>
-                    <span class="nav-text">Мои карты</span>
-                </button>
-                <button class="nav-button" data-action="history">
-                    <span class="nav-icon">📈</span>
-                    <span class="nav-text">История</span>
-                </button>
-                <button class="nav-button" data-action="receipts">
-                    <span class="nav-icon">🧾</span>
-                    <span class="nav-text">Квитанции</span>
-                </button>
-                <button id="logoutBtn" class="nav-button logout-btn">
-                    <span class="nav-icon">🚪</span>
-                    <span class="nav-text">Выйти</span>
-                </button>
-            </div>
-
-            <div id="adminNav" style="display: none; margin-top: 20px;">
-                <div class="section-title">⚙️ АДМИН ПАНЕЛЬ</div>
-                <button class="nav-button" data-action="admin_users">
-                    <span class="nav-icon">👥</span>
-                    <span class="nav-text">Пользователи</span>
-                </button>
-                <button class="nav-button" data-action="admin_passports">
-                    <span class="nav-icon">📋</span>
-                    <span class="nav-text">Паспорта</span>
-                </button>
-                <button class="nav-button" data-action="admin_ops">
-                    <span class="nav-icon">📊</span>
-                    <span class="nav-text">Операции</span>
-                </button>
-                <button class="nav-button" data-action="admin_reports">
-                    <span class="nav-icon">📈</span>
-                    <span class="nav-text">Аналитика</span>
-                </button>
-                <button class="nav-button" data-action="admin_settings">
-                    <span class="nav-icon">⚙️</span>
-                    <span class="nav-text">Настройки</span>
-                </button>
-            </div>
-        </div>
-
-        <div class="main">
-            <!-- Форма входа -->
-            <div id="authView" class="card">
-                <div class="auth-header">
-                    <h2>Вход в систему</h2>
-                    <div class="muted">Премиум банкинг 24/7</div>
+    <div class="container">
+        <div class="bank-app">
+            <!-- Боковая панель -->
+            <div class="sidebar">
+                <div class="logo">
+                    <span class="logo-text">А БАНК</span>
+                    <span class="logo-badge">online</span>
                 </div>
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label>Электронная почта</label>
-                        <input type="email" id="loginEmail" required placeholder="you@example.com" />
+
+                <div class="user-info-card">
+                    <div id="userGreeting">Войдите в систему</div>
+                    <div id="userDetails" class="user-details">Для доступа к банкингу</div>
+                </div>
+
+                <!-- Навигация для пользователя -->
+                <div id="userNav" class="nav-section" style="display: none;">
+                    <button class="nav-btn" onclick="showSection('dashboard')">
+                        <span class="nav-icon">📊</span>
+                        Дашборд
+                    </button>
+                    <button class="nav-btn" onclick="showSection('transfer')">
+                        <span class="nav-icon">💸</span>
+                        Перевод
+                    </button>
+                    <button class="nav-btn" onclick="showSection('cards')">
+                        <span class="nav-icon">💳</span>
+                        Карты
+                    </button>
+                    <button class="nav-btn" onclick="showSection('history')">
+                        <span class="nav-icon">📈</span>
+                        История
+                    </button>
+                    <button class="nav-btn logout-btn" onclick="logout()">
+                        <span class="nav-icon">🚪</span>
+                        Выйти
+                    </button>
+                </div>
+
+                <!-- Навигация для админа -->
+                <div id="adminNav" class="nav-section" style="display: none;">
+                    <div class="nav-title">Админ панель</div>
+                    <button class="nav-btn" onclick="showSection('adminUsers')">
+                        <span class="nav-icon">👥</span>
+                        Пользователи
+                    </button>
+                    <button class="nav-btn" onclick="showSection('adminPassports')">
+                        <span class="nav-icon">📋</span>
+                        Паспорта
+                    </button>
+                    <button class="nav-btn" onclick="showSection('adminOperations')">
+                        <span class="nav-icon">📊</span>
+                        Операции
+                    </button>
+                </div>
+            </div>
+
+            <!-- Основной контент -->
+            <div class="main-content">
+                <!-- Экран входа -->
+                <div id="loginScreen" class="content-section active">
+                    <div class="welcome-card">
+                        <div class="welcome-icon">🏦</div>
+                        <h1>Добро пожаловать в А БАНК</h1>
+                        <p class="welcome-text">Безопасный онлайн-банкинг 24/7</p>
                     </div>
-                    <div class="form-group">
-                        <label>Пароль</label>
-                        <input type="password" id="loginPass" required placeholder="••••••••" />
-                    </div>
-                    <div class="actions">
-                        <button type="submit" class="btn-primary">
-                            <span class="btn-icon">🔐</span>
-                            Войти в систему
-                        </button>
-                        <button type="button" id="showRegister" class="btn-secondary">
+
+                    <div class="auth-card">
+                        <h2>Вход в систему</h2>
+                        <form id="loginForm" class="auth-form">
+                            <div class="input-group">
+                                <label>Электронная почта</label>
+                                <input type="email" id="loginEmail" placeholder="your@email.com" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Пароль</label>
+                                <input type="password" id="loginPassword" placeholder="••••••••" required>
+                            </div>
+                            <button type="submit" class="auth-btn primary">
+                                <span class="btn-icon">🔐</span>
+                                Войти
+                            </button>
+                        </form>
+                        <button class="auth-btn secondary" onclick="showSection('register')">
                             <span class="btn-icon">📝</span>
                             Создать аккаунт
                         </button>
                     </div>
-                </form>
-            </div>
-
-            <!-- Форма регистрации -->
-            <div id="registerView" class="card" style="display: none;">
-                <div class="auth-header">
-                    <h2>Создание аккаунта</h2>
-                    <div class="muted">Присоединяйтесь к А БАНК</div>
                 </div>
-                <form id="regForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Имя</label>
-                            <input id="regName" required placeholder="Иван" />
-                        </div>
-                        <div class="form-group">
-                            <label>Фамилия</label>
-                            <input id="regLastName" required placeholder="Иванов" />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input id="regEmail" type="email" required placeholder="ivan@example.com" />
-                    </div>
-                    <div class="form-group">
-                        <label>Телефон</label>
-                        <input id="regPhone" type="tel" required placeholder="+7 (999) 999-99-99" />
-                    </div>
-                    <div class="form-group">
-                        <label>Пароль</label>
-                        <input id="regPass" type="password" required placeholder="Минимум 8 символов" />
-                        <div class="form-hint">Не менее 8 символов</div>
-                    </div>
-                    <div class="actions">
-                        <button type="submit" class="btn-primary">
-                            <span class="btn-icon">🚀</span>
-                            Создать аккаунт
-                        </button>
-                        <button type="button" id="showLogin" class="btn-secondary">
+
+                <!-- Экран регистрации -->
+                <div id="registerScreen" class="content-section">
+                    <div class="auth-card">
+                        <h2>Создание аккаунта</h2>
+                        <form id="registerForm" class="auth-form">
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label>Имя</label>
+                                    <input type="text" id="regName" placeholder="Иван" required>
+                                </div>
+                                <div class="input-group">
+                                    <label>Фамилия</label>
+                                    <input type="text" id="regLastName" placeholder="Иванов" required>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label>Email</label>
+                                <input type="email" id="regEmail" placeholder="ivan@example.com" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Телефон</label>
+                                <input type="tel" id="regPhone" placeholder="+7 (999) 999-99-99" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Пароль</label>
+                                <input type="password" id="regPassword" placeholder="Минимум 8 символов" required>
+                            </div>
+                            <button type="submit" class="auth-btn primary">
+                                <span class="btn-icon">🚀</span>
+                                Создать аккаунт
+                            </button>
+                        </form>
+                        <button class="auth-btn secondary" onclick="showSection('login')">
                             <span class="btn-icon">↩️</span>
                             Назад к входу
                         </button>
                     </div>
-                </form>
-            </div>
+                </div>
 
-            <!-- Область контента -->
-            <div id="contentArea">
-                <div class="card welcome-card">
-                    <div class="welcome-icon">🏦</div>
-                    <h2>Добро пожаловать в А БАНК</h2>
-                    <p class="muted">Войдите в систему для доступа к премиум банкингу</p>
+                <!-- Дашборд -->
+                <div id="dashboardScreen" class="content-section">
+                    <div class="dashboard-header">
+                        <div id="userAvatar" class="user-avatar">UI</div>
+                        <div class="user-welcome">
+                            <h2 id="userName">Пользователь</h2>
+                            <p id="userContact" class="user-contact">email@example.com</p>
+                        </div>
+                    </div>
+
+                    <div class="balance-card">
+                        <div class="balance-label">Ваш баланс</div>
+                        <div id="userBalance" class="balance-amount">0 ₽</div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">💸</div>
+                            <div class="stat-number" id="transfersCount">0</div>
+                            <div class="stat-label">Переводов</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">💳</div>
+                            <div class="stat-number" id="cardsCount">0</div>
+                            <div class="stat-label">Карт</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-number" id="operationsCount">0</div>
+                            <div class="stat-label">Операций</div>
+                        </div>
+                    </div>
+
+                    <div class="quick-actions">
+                        <h3>Быстрые действия</h3>
+                        <div class="actions-grid">
+                            <div class="action-card" onclick="showSection('transfer')">
+                                <div class="action-icon">💸</div>
+                                <div class="action-text">Перевод</div>
+                            </div>
+                            <div class="action-card" onclick="showSection('cards')">
+                                <div class="action-icon">💳</div>
+                                <div class="action-text">Карты</div>
+                            </div>
+                            <div class="action-card" onclick="showSection('history')">
+                                <div class="action-icon">📈</div>
+                                <div class="action-text">История</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="userCards" class="cards-section">
+                        <!-- Карты будут здесь -->
+                    </div>
+                </div>
+
+                <!-- Переводы -->
+                <div id="transferScreen" class="content-section">
+                    <div class="section-header">
+                        <h2>💸 Перевод средств</h2>
+                        <p>Безопасный перевод любым удобным способом</p>
+                    </div>
+
+                    <div class="transfer-card">
+                        <div class="transfer-tabs">
+                            <button class="tab-btn active" data-method="email">По Email</button>
+                            <button class="tab-btn" data-method="phone">По Телефону</button>
+                            <button class="tab-btn" data-method="card">По Карте</button>
+                        </div>
+
+                        <form id="transferForm" class="transfer-form">
+                            <div id="emailFields" class="transfer-fields active">
+                                <div class="input-group">
+                                    <label>Email получателя</label>
+                                    <input type="email" id="transferEmail" placeholder="recipient@example.com">
+                                </div>
+                            </div>
+
+                            <div id="phoneFields" class="transfer-fields">
+                                <div class="input-group">
+                                    <label>Телефон получателя</label>
+                                    <input type="tel" id="transferPhone" placeholder="+7 (999) 999-99-99">
+                                </div>
+                            </div>
+
+                            <div id="cardFields" class="transfer-fields">
+                                <div class="input-group">
+                                    <label>Номер карты</label>
+                                    <input type="text" id="transferCard" placeholder="4276 1234 5678 9012">
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Сумма перевода</label>
+                                <input type="number" id="transferAmount" placeholder="1000" min="1" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Назначение платежа</label>
+                                <input type="text" id="transferDescription" placeholder="Например: за услуги">
+                            </div>
+
+                            <button type="submit" class="transfer-btn">
+                                <span class="btn-icon">🚀</span>
+                                Выполнить перевод
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="recent-transfers">
+                        <h3>Последние переводы</h3>
+                        <div id="recentTransfersList" class="transfers-list">
+                            <!-- Список переводов -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Остальные секции (карты, история, админ-панель) -->
+                <div id="otherScreens">
+                    <!-- Здесь будут другие экраны -->
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Уведомления -->
     <div id="notificationContainer"></div>
 
     <script src="script.js"></script>
