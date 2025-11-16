@@ -4,302 +4,479 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>А БАНК — Онлайн банкинг</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --grad: linear-gradient(135deg, #ffd94d 0%, #ff5a5a 50%, #7a4cff 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --accent: #ff5a5a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--grad);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .app {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            overflow: hidden;
+            display: flex;
+            min-height: 600px;
+        }
+        
+        .sidebar {
+            width: 300px;
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            color: white;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-badge {
+            background: white;
+            color: black;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+        
+        .user-card {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .nav-btn {
+            width: 100%;
+            background: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .main {
+            flex: 1;
+            padding: 30px;
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .balance {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="bank-app">
-            <!-- Боковая панель -->
-            <div class="sidebar">
-                <div class="logo">
-                    <span class="logo-text">А БАНК</span>
-                    <span class="logo-badge">online</span>
-                </div>
-
-                <div class="user-info-card">
-                    <div id="userGreeting">Войдите в систему</div>
-                    <div id="userDetails" class="user-details">Для доступа к банкингу</div>
-                </div>
-
-                <!-- Навигация -->
-                <div id="userNav" class="nav-section" style="display: none;">
-                    <button class="nav-btn" data-section="dashboard">
-                        <span class="nav-icon">📊</span>
-                        Дашборд
-                    </button>
-                    <button class="nav-btn" data-section="transfer">
-                        <span class="nav-icon">💸</span>
-                        Перевод
-                    </button>
-                    <button class="nav-btn" data-section="cards">
-                        <span class="nav-icon">💳</span>
-                        Карты
-                    </button>
-                    <button class="nav-btn" data-section="history">
-                        <span class="nav-icon">📈</span>
-                        История
-                    </button>
-                    <button class="nav-btn logout-btn" id="logoutBtn">
-                        <span class="nav-icon">🚪</span>
-                        Выйти
-                    </button>
-                </div>
-
-                <!-- Админ панель -->
-                <div id="adminNav" class="nav-section" style="display: none;">
-                    <div class="nav-title">Админ панель</div>
-                    <button class="nav-btn" data-section="adminUsers">
-                        <span class="nav-icon">👥</span>
-                        Пользователи
-                    </button>
-                    <button class="nav-btn" data-section="adminPassports">
-                        <span class="nav-icon">📋</span>
-                        Паспорта
-                    </button>
-                    <button class="nav-btn" data-section="adminOperations">
-                        <span class="nav-icon">📊</span>
-                        Операции
-                    </button>
+    <div class="app">
+        <div class="sidebar">
+            <div class="logo">
+                А БАНК <span class="logo-badge">online</span>
+            </div>
+            
+            <div class="user-card">
+                <div id="userGreeting">Войдите в систему</div>
+                <div id="userDetails">Для доступа к банкингу</div>
+            </div>
+            
+            <div id="nav" style="display: none;">
+                <button class="nav-btn" onclick="showSection('dashboard')">📊 Дашборд</button>
+                <button class="nav-btn" onclick="showSection('transfer')">💸 Перевод</button>
+                <button class="nav-btn" onclick="showSection('cards')">💳 Карты</button>
+                <button class="nav-btn" onclick="showSection('history')">📈 История</button>
+                <button class="nav-btn" onclick="logout()" style="background: transparent; color: white; border: 2px solid rgba(255,255,255,0.3);">🚪 Выйти</button>
+            </div>
+        </div>
+        
+        <div class="main">
+            <!-- Вход -->
+            <div id="loginSection" class="content-section active">
+                <div class="card">
+                    <h2>Вход в систему</h2>
+                    <input type="email" id="loginEmail" placeholder="Email" value="admin@abank.ru">
+                    <input type="password" id="loginPassword" placeholder="Пароль" value="Admin123!">
+                    <button onclick="login()">Войти</button>
+                    <button onclick="showSection('register')" style="background: transparent; color: #666; border: 2px solid #ddd; margin-left: 10px;">Регистрация</button>
                 </div>
             </div>
-
-            <!-- Основной контент -->
-            <div class="main-content">
-                <!-- Вход -->
-                <div id="loginSection" class="content-section active">
-                    <div class="welcome-card">
-                        <div class="welcome-icon">🏦</div>
-                        <h1>Добро пожаловать в А БАНК</h1>
-                        <p class="welcome-text">Безопасный онлайн-банкинг 24/7</p>
-                    </div>
-
-                    <div class="auth-card">
-                        <h2>Вход в систему</h2>
-                        <form id="loginForm" class="auth-form">
-                            <div class="input-group">
-                                <label>Электронная почта</label>
-                                <input type="email" id="loginEmail" placeholder="your@email.com" required>
-                            </div>
-                            <div class="input-group">
-                                <label>Пароль</label>
-                                <input type="password" id="loginPassword" placeholder="••••••••" required>
-                            </div>
-                            <button type="submit" class="auth-btn primary">
-                                <span class="btn-icon">🔐</span>
-                                Войти
-                            </button>
-                        </form>
-                        <button class="auth-btn secondary" id="showRegisterBtn">
-                            <span class="btn-icon">📝</span>
-                            Создать аккаунт
-                        </button>
-                    </div>
+            
+            <!-- Регистрация -->
+            <div id="registerSection" class="content-section">
+                <div class="card">
+                    <h2>Регистрация</h2>
+                    <input type="text" id="regName" placeholder="Имя">
+                    <input type="text" id="regLastName" placeholder="Фамилия">
+                    <input type="email" id="regEmail" placeholder="Email">
+                    <input type="tel" id="regPhone" placeholder="Телефон">
+                    <input type="password" id="regPassword" placeholder="Пароль">
+                    <button onclick="register()">Создать аккаунт</button>
+                    <button onclick="showSection('login')" style="background: transparent; color: #666; border: 2px solid #ddd; margin-left: 10px;">Назад</button>
                 </div>
-
-                <!-- Регистрация -->
-                <div id="registerSection" class="content-section">
-                    <div class="auth-card">
-                        <h2>Создание аккаунта</h2>
-                        <form id="registerForm" class="auth-form">
-                            <div class="input-row">
-                                <div class="input-group">
-                                    <label>Имя</label>
-                                    <input type="text" id="regName" placeholder="Иван" required>
-                                </div>
-                                <div class="input-group">
-                                    <label>Фамилия</label>
-                                    <input type="text" id="regLastName" placeholder="Иванов" required>
-                                </div>
-                            </div>
-                            <div class="input-group">
-                                <label>Email</label>
-                                <input type="email" id="regEmail" placeholder="ivan@example.com" required>
-                            </div>
-                            <div class="input-group">
-                                <label>Телефон</label>
-                                <input type="tel" id="regPhone" placeholder="+7 (999) 999-99-99" required>
-                            </div>
-                            <div class="input-group">
-                                <label>Пароль</label>
-                                <input type="password" id="regPassword" placeholder="Минимум 8 символов" required>
-                            </div>
-                            <button type="submit" class="auth-btn primary">
-                                <span class="btn-icon">🚀</span>
-                                Создать аккаунт
-                            </button>
-                        </form>
-                        <button class="auth-btn secondary" id="showLoginBtn">
-                            <span class="btn-icon">↩️</span>
-                            Назад к входу
-                        </button>
-                    </div>
+            </div>
+            
+            <!-- Дашборд -->
+            <div id="dashboardSection" class="content-section">
+                <div class="card">
+                    <h2 id="userWelcome">Добро пожаловать!</h2>
+                    <div class="balance" id="userBalance">0 ₽</div>
+                    <p>Ваш текущий баланс</p>
                 </div>
-
-                <!-- Дашборд -->
-                <div id="dashboardSection" class="content-section">
-                    <div class="dashboard-header">
-                        <div id="userAvatar" class="user-avatar">UI</div>
-                        <div class="user-welcome">
-                            <h2 id="userName">Пользователь</h2>
-                            <p id="userContact" class="user-contact">email@example.com</p>
-                        </div>
-                    </div>
-
-                    <div class="balance-card">
-                        <div class="balance-label">Ваш баланс</div>
-                        <div id="userBalance" class="balance-amount">0 ₽</div>
-                    </div>
-
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon">💸</div>
-                            <div class="stat-number" id="transfersCount">0</div>
-                            <div class="stat-label">Переводов</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">💳</div>
-                            <div class="stat-number" id="cardsCount">0</div>
-                            <div class="stat-label">Карт</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">📊</div>
-                            <div class="stat-number" id="operationsCount">0</div>
-                            <div class="stat-label">Операций</div>
-                        </div>
-                    </div>
-
-                    <div class="quick-actions">
-                        <h3>Быстрые действия</h3>
-                        <div class="actions-grid">
-                            <div class="action-card" data-section="transfer">
-                                <div class="action-icon">💸</div>
-                                <div class="action-text">Перевод</div>
-                            </div>
-                            <div class="action-card" data-section="cards">
-                                <div class="action-icon">💳</div>
-                                <div class="action-text">Карты</div>
-                            </div>
-                            <div class="action-card" data-section="history">
-                                <div class="action-icon">📈</div>
-                                <div class="action-text">История</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="userCards" class="cards-section">
-                        <!-- Карты будут здесь -->
-                    </div>
+                
+                <div class="card">
+                    <h3>Быстрые действия</h3>
+                    <button onclick="showSection('transfer')">💸 Перевод</button>
+                    <button onclick="showSection('cards')">💳 Карты</button>
+                    <button onclick="showSection('history')">📈 История</button>
                 </div>
-
-                <!-- Переводы -->
-                <div id="transferSection" class="content-section">
-                    <div class="section-header">
-                        <h2>💸 Перевод средств</h2>
-                        <p>Безопасный перевод любым удобным способом</p>
-                    </div>
-
-                    <div class="transfer-card">
-                        <div class="transfer-tabs">
-                            <button class="tab-btn active" data-method="email">По Email</button>
-                            <button class="tab-btn" data-method="phone">По Телефону</button>
-                            <button class="tab-btn" data-method="card">По Карте</button>
-                        </div>
-
-                        <form id="transferForm" class="transfer-form">
-                            <div id="emailFields" class="transfer-fields active">
-                                <div class="input-group">
-                                    <label>Email получателя</label>
-                                    <input type="email" id="transferEmail" placeholder="recipient@example.com">
-                                </div>
-                            </div>
-
-                            <div id="phoneFields" class="transfer-fields">
-                                <div class="input-group">
-                                    <label>Телефон получателя</label>
-                                    <input type="tel" id="transferPhone" placeholder="+7 (999) 999-99-99">
-                                </div>
-                            </div>
-
-                            <div id="cardFields" class="transfer-fields">
-                                <div class="input-group">
-                                    <label>Номер карты</label>
-                                    <input type="text" id="transferCard" placeholder="4276 1234 5678 9012">
-                                </div>
-                            </div>
-
-                            <div class="input-group">
-                                <label>Сумма перевода</label>
-                                <input type="number" id="transferAmount" placeholder="1000" min="1" required>
-                            </div>
-
-                            <div class="input-group">
-                                <label>Назначение платежа</label>
-                                <input type="text" id="transferDescription" placeholder="Например: за услуги">
-                            </div>
-
-                            <button type="submit" class="transfer-btn">
-                                <span class="btn-icon">🚀</span>
-                                Выполнить перевод
-                            </button>
-                        </form>
-                    </div>
-
-                    <div class="recent-transfers">
-                        <h3>Последние переводы</h3>
-                        <div id="recentTransfersList" class="transfers-list">
-                            <!-- Список переводов -->
-                        </div>
-                    </div>
+            </div>
+            
+            <!-- Перевод -->
+            <div id="transferSection" class="content-section">
+                <div class="card">
+                    <h2>Перевод средств</h2>
+                    <input type="email" id="transferEmail" placeholder="Email получателя">
+                    <input type="number" id="transferAmount" placeholder="Сумма">
+                    <input type="text" id="transferDesc" placeholder="Назначение">
+                    <button onclick="makeTransfer()">Выполнить перевод</button>
                 </div>
-
-                <!-- Другие секции -->
-                <div id="cardsSection" class="content-section">
-                    <div class="section-header">
-                        <h2>💳 Мои карты</h2>
-                        <p>Управление вашими банковскими картами</p>
-                    </div>
-                    <div id="cardsList"></div>
+            </div>
+            
+            <!-- Карты -->
+            <div id="cardsSection" class="content-section">
+                <div class="card">
+                    <h2>Мои карты</h2>
+                    <div id="cardsList">Карт пока нет</div>
+                    <button onclick="applyCard()" style="margin-top: 15px;">💳 Выпустить карту</button>
                 </div>
-
-                <div id="historySection" class="content-section">
-                    <div class="section-header">
-                        <h2>📈 История операций</h2>
-                        <p>Все ваши финансовые операции</p>
-                    </div>
-                    <div id="operationsList"></div>
-                </div>
-
-                <!-- Админ секции -->
-                <div id="adminUsersSection" class="content-section">
-                    <div class="section-header">
-                        <h2>👥 Управление пользователями</h2>
-                        <p>Администрирование пользователей системы</p>
-                    </div>
-                    <div id="usersList"></div>
-                </div>
-
-                <div id="adminPassportsSection" class="content-section">
-                    <div class="section-header">
-                        <h2>📋 Управление паспортами</h2>
-                        <p>Верификация паспортных данных</p>
-                    </div>
-                    <div id="passportsList"></div>
-                </div>
-
-                <div id="adminOperationsSection" class="content-section">
-                    <div class="section-header">
-                        <h2>📊 Все операции</h2>
-                        <p>Мониторинг всех операций в системе</p>
-                    </div>
-                    <div id="allOperationsList"></div>
+            </div>
+            
+            <!-- История -->
+            <div id="historySection" class="content-section">
+                <div class="card">
+                    <h2>История операций</h2>
+                    <div id="operationsList">Операций пока нет</div>
                 </div>
             </div>
         </div>
     </div>
-
+    
     <div id="notificationContainer"></div>
 
-    <script src="database.js"></script>
-    <script src="script.js"></script>
+    <script>
+        // Простая база данных
+        const DB = {
+            users: JSON.parse(localStorage.getItem('abank_users')) || [
+                {
+                    id: 'admin',
+                    name: 'Админ',
+                    lastName: 'Системы',
+                    email: 'admin@abank.ru',
+                    phone: '+7 (999) 000-00-00',
+                    password: 'Admin123!',
+                    balance: 100000,
+                    role: 'admin',
+                    cards: [],
+                    status: 'active'
+                }
+            ],
+            operations: JSON.parse(localStorage.getItem('abank_operations')) || [],
+            session: JSON.parse(localStorage.getItem('abank_session')) || null
+        };
+        
+        let currentUser = null;
+        
+        // Сохранение данных
+        function saveData() {
+            localStorage.setItem('abank_users', JSON.stringify(DB.users));
+            localStorage.setItem('abank_operations', JSON.stringify(DB.operations));
+            localStorage.setItem('abank_session', JSON.stringify(DB.session));
+        }
+        
+        // Показать секцию
+        function showSection(sectionName) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionName + 'Section').classList.add('active');
+        }
+        
+        // Уведомление
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            if (type === 'error') notification.style.background = '#ff5a5a';
+            
+            container.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+        
+        // Вход
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const user = DB.users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                DB.session = { userId: user.id };
+                saveData();
+                updateUI();
+                showNotification('Вход выполнен!');
+            } else {
+                showNotification('Неверный email или пароль', 'error');
+            }
+        }
+        
+        // Регистрация
+        function register() {
+            const userData = {
+                name: document.getElementById('regName').value,
+                lastName: document.getElementById('regLastName').value,
+                email: document.getElementById('regEmail').value,
+                phone: document.getElementById('regPhone').value,
+                password: document.getElementById('regPassword').value
+            };
+            
+            if (DB.users.find(u => u.email === userData.email)) {
+                showNotification('Email уже занят', 'error');
+                return;
+            }
+            
+            const newUser = {
+                id: 'user_' + Date.now(),
+                ...userData,
+                balance: 500,
+                role: 'user',
+                cards: [],
+                status: 'active'
+            };
+            
+            DB.users.push(newUser);
+            DB.session = { userId: newUser.id };
+            currentUser = newUser;
+            saveData();
+            
+            // Добавляем бонусную операцию
+            DB.operations.push({
+                type: 'welcome_bonus',
+                userId: newUser.id,
+                amount: 500,
+                description: 'Приветственный бонус',
+                at: new Date().toISOString()
+            });
+            
+            updateUI();
+            showNotification('Аккаунт создан! Получен бонус 500 ₽');
+        }
+        
+        // Перевод
+        function makeTransfer() {
+            const email = document.getElementById('transferEmail').value;
+            const amount = parseFloat(document.getElementById('transferAmount').value);
+            const description = document.getElementById('transferDesc').value;
+            
+            const recipient = DB.users.find(u => u.email === email);
+            
+            if (!recipient) {
+                showNotification('Получатель не найден', 'error');
+                return;
+            }
+            
+            if (currentUser.balance < amount) {
+                showNotification('Недостаточно средств', 'error');
+                return;
+            }
+            
+            // Выполняем перевод
+            currentUser.balance -= amount;
+            recipient.balance += amount;
+            
+            // Записываем операцию
+            DB.operations.push({
+                type: 'transfer',
+                fromId: currentUser.id,
+                toId: recipient.id,
+                amount: amount,
+                description: description,
+                at: new Date().toISOString()
+            });
+            
+            saveData();
+            updateUI();
+            showNotification(`Перевод на ${amount} ₽ выполнен!`);
+            showSection('dashboard');
+        }
+        
+        // Выпуск карты
+        function applyCard() {
+            const cardNumber = '4276 ' + 
+                Math.floor(1000 + Math.random() * 9000) + ' ' + 
+                Math.floor(1000 + Math.random() * 9000) + ' ' + 
+                Math.floor(1000 + Math.random() * 9000);
+                
+            const newCard = {
+                id: 'card_' + Date.now(),
+                number: cardNumber,
+                type: 'Visa Classic',
+                balance: currentUser.balance,
+                issuedAt: new Date().toISOString()
+            };
+            
+            currentUser.cards.push(newCard);
+            
+            DB.operations.push({
+                type: 'card_issued',
+                userId: currentUser.id,
+                details: newCard,
+                at: new Date().toISOString()
+            });
+            
+            saveData();
+            updateUI();
+            showNotification(`Карта выпущена: ${cardNumber}`);
+            showSection('dashboard');
+        }
+        
+        // Обновление интерфейса
+        function updateUI() {
+            if (currentUser) {
+                // Показываем навигацию
+                document.getElementById('nav').style.display = 'block';
+                document.getElementById('userGreeting').textContent = `Привет, ${currentUser.name}`;
+                document.getElementById('userDetails').textContent = currentUser.email;
+                
+                // Обновляем дашборд
+                document.getElementById('userWelcome').textContent = `Привет, ${currentUser.name} ${currentUser.lastName}`;
+                document.getElementById('userBalance').textContent = currentUser.balance + ' ₽';
+                
+                // Обновляем карты
+                const cardsList = document.getElementById('cardsList');
+                if (currentUser.cards.length > 0) {
+                    cardsList.innerHTML = currentUser.cards.map(card => 
+                        `<div style="background: #667eea; color: white; padding: 15px; border-radius: 10px; margin: 10px 0;">
+                            <div style="font-weight: bold;">${card.number}</div>
+                            <div>${card.type} • ${card.balance} ₽</div>
+                        </div>`
+                    ).join('');
+                }
+                
+                // Обновляем историю
+                const userOps = DB.operations.filter(op => 
+                    op.userId === currentUser.id || op.fromId === currentUser.id
+                );
+                const operationsList = document.getElementById('operationsList');
+                if (userOps.length > 0) {
+                    operationsList.innerHTML = userOps.map(op => 
+                        `<div style="padding: 10px; border-bottom: 1px solid #eee;">
+                            <div><strong>${op.type}</strong> • ${op.amount || 0} ₽</div>
+                            <div style="color: #666; font-size: 14px;">${op.description}</div>
+                        </div>`
+                    ).join('');
+                }
+                
+                showSection('dashboard');
+            } else {
+                document.getElementById('nav').style.display = 'none';
+                document.getElementById('userGreeting').textContent = 'Войдите в систему';
+                document.getElementById('userDetails').textContent = 'Для доступа к банкингу';
+                showSection('login');
+            }
+        }
+        
+        // Выход
+        function logout() {
+            currentUser = null;
+            DB.session = null;
+            saveData();
+            updateUI();
+            showNotification('Вы вышли из системы');
+        }
+        
+        // Проверка авторизации при загрузке
+        window.onload = function() {
+            if (DB.session && DB.session.userId) {
+                currentUser = DB.users.find(u => u.id === DB.session.userId);
+            }
+            updateUI();
+        };
+    </script>
 </body>
 </html>
