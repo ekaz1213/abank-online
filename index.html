@@ -582,6 +582,9 @@
                             <div class="stat-value" id="adminTotalBalance">0 ₽</div>
                         </div>
                     </div>
+                    <button onclick="resetDatabase()" style="background: #ff4757; margin-top: 10px;">
+    🗃️ Сбросить базу данных (Debug)
+</button>
 
                     <h3>Управление пользователями</h3>
                     <div style="max-height: 400px; overflow-y: auto; margin-top: 20px;">
@@ -617,459 +620,528 @@
     <div id="notificationContainer"></div>
 
     <script>
-        // База данных с паспортными данными
-        const DB = {
-            users: JSON.parse(localStorage.getItem('abank_users')) || [{
-                id: 'admin', 
-                name: 'Главный', 
-                lastName: 'Администратор', 
-                email: 'admin@abank.ru', 
-                phone: '+7 (999) 000-00-00', 
-                password: 'Admin123!', 
-                balance: 500000,
-                role: 'admin', 
-                cards: [], 
-                status: 'premium', 
-                verified: true,
-                rank: 'ADMIN',
-                passport: {
-                    series: '0000',
-                    number: '000000',
-                    issued: 'А БАНК',
-                    issueDate: '2020-01-01',
-                    divisionCode: '000-000',
-                    birthDate: '1980-01-01',
-                    birthPlace: 'Москва'
-                }
-            }],
-            operations: JSON.parse(localStorage.getItem('abank_operations')) || [],
-            session: JSON.parse(localStorage.getItem('abank_session')) || null
+    // Улучшенная база данных с принудительным созданием админа
+    const initializeDB = () => {
+        const defaultUsers = [{
+            id: 'admin', 
+            name: 'Главный', 
+            lastName: 'Администратор', 
+            email: 'admin@abank.ru', 
+            phone: '+7 (999) 000-00-00', 
+            password: 'Admin123!', 
+            balance: 500000,
+            role: 'admin', 
+            cards: [], 
+            status: 'premium', 
+            verified: true,
+            rank: 'ADMIN',
+            passport: {
+                series: '0000',
+                number: '000000',
+                issued: 'А БАНК',
+                issueDate: '2020-01-01',
+                divisionCode: '000-000',
+                birthDate: '1980-01-01',
+                birthPlace: 'Москва'
+            }
+        }];
+
+        // Всегда перезаписываем админа при инициализации
+        localStorage.setItem('abank_users', JSON.stringify(defaultUsers));
+        
+        // Инициализируем другие данные если их нет
+        if (!localStorage.getItem('abank_operations')) {
+            localStorage.setItem('abank_operations', JSON.stringify([]));
+        }
+        if (!localStorage.getItem('abank_session')) {
+            localStorage.setItem('abank_session', JSON.stringify(null));
+        }
+        
+        return {
+            users: defaultUsers,
+            operations: JSON.parse(localStorage.getItem('abank_operations')),
+            session: JSON.parse(localStorage.getItem('abank_session'))
         };
+    };
 
-        let currentUser = null;
-        let transferType = 'email';
+    // Инициализируем БД
+    let DB = initializeDB();
+    let currentUser = null;
+    let transferType = 'email';
 
-        function saveData() {
-            localStorage.setItem('abank_users', JSON.stringify(DB.users));
-            localStorage.setItem('abank_operations', JSON.stringify(DB.operations));
-            localStorage.setItem('abank_session', JSON.stringify(DB.session));
-        }
+    // Улучшенное сохранение данных
+    function saveData() {
+        localStorage.setItem('abank_users', JSON.stringify(DB.users));
+        localStorage.setItem('abank_operations', JSON.stringify(DB.operations));
+        localStorage.setItem('abank_session', JSON.stringify(DB.session));
+        
+        // Перезагружаем данные из localStorage
+        DB.users = JSON.parse(localStorage.getItem('abank_users'));
+        DB.operations = JSON.parse(localStorage.getItem('abank_operations'));
+    }
 
-        function showSection(sectionName) {
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            document.getElementById(sectionName + 'Section').classList.add('active');
-            
-            if (sectionName === 'dashboard') loadDashboard();
-            if (sectionName === 'history') loadHistory();
-            if (sectionName === 'profile') loadProfile();
-            if (sectionName === 'admin') loadAdminPanel();
-        }
+    function showSection(sectionName) {
+        document.querySelectorAll('.content-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById(sectionName + 'Section').classList.add('active');
+        
+        if (sectionName === 'dashboard') loadDashboard();
+        if (sectionName === 'history') loadHistory();
+        if (sectionName === 'profile') loadProfile();
+        if (sectionName === 'admin') loadAdminPanel();
+    }
 
-        function showNotification(message, type = 'success') {
-            const container = document.getElementById('notificationContainer');
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.textContent = message;
-            if (type === 'error') notification.style.background = '#ff6b6b';
-            if (type === 'warning') notification.style.background = '#ffd43b';
-            container.appendChild(notification);
-            setTimeout(() => notification.remove(), 4000);
-        }
+    function showNotification(message, type = 'success') {
+        const container = document.getElementById('notificationContainer');
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.textContent = message;
+        if (type === 'error') notification.style.background = '#ff6b6b';
+        if (type === 'warning') notification.style.background = '#ffd43b';
+        container.appendChild(notification);
+        setTimeout(() => notification.remove(), 4000);
+    }
 
-        function login() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const user = DB.users.find(u => u.email === email && u.password === password);
-            
-            if (user) {
-                currentUser = user;
-                DB.session = { userId: user.id };
-                saveData();
-                updateUI();
-                showNotification('🎉 Добро пожаловать в премиум-банкинг!');
-            } else {
-                showNotification('❌ Неверный email или пароль', 'error');
-            }
-        }
-
-        function register() {
-            const userData = {
-                name: document.getElementById('regName').value,
-                lastName: document.getElementById('regLastName').value,
-                email: document.getElementById('regEmail').value,
-                phone: document.getElementById('regPhone').value,
-                password: document.getElementById('regPassword').value
-            };
-            
-            if (DB.users.find(u => u.email === userData.email)) {
-                showNotification('❌ Email уже занят', 'error');
-                return;
-            }
-            
-            const newUser = {
-                id: 'user_' + Date.now(),
-                ...userData,
-                balance: 1000,
-                role: 'user',
-                cards: [],
-                status: 'active',
-                verified: false,
-                rank: 'STANDARD',
-                passport: null
-            };
-            
-            DB.users.push(newUser);
-            DB.session = { userId: newUser.id };
-            currentUser = newUser;
-            
-            const bonusOperation = {
-                id: 'op_' + Date.now(),
-                type: 'welcome_bonus',
-                userId: newUser.id,
-                amount: 1000,
-                description: 'Приветственный бонус за регистрацию',
-                at: new Date().toISOString()
-            };
-            
-            DB.operations.push(bonusOperation);
+    function login() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        
+        // Перезагружаем пользователей из localStorage
+        DB.users = JSON.parse(localStorage.getItem('abank_users'));
+        
+        const user = DB.users.find(u => u.email === email && u.password === password);
+        
+        if (user) {
+            currentUser = user;
+            DB.session = { userId: user.id };
             saveData();
             updateUI();
-            showNotification('🎁 Аккаунт создан! На ваш счет зачислен бонус 1000 ₽');
+            showNotification('🎉 Добро пожаловать в премиум-банкинг!');
+        } else {
+            showNotification('❌ Неверный email или пароль', 'error');
         }
+    }
 
-        function setTransferType(type) {
-            transferType = type;
-            document.querySelectorAll('.transfer-option').forEach(opt => {
-                opt.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            const input = document.getElementById('transferRecipient');
-            switch(type) {
-                case 'email': input.placeholder = 'Email получателя'; break;
-                case 'phone': input.placeholder = 'Телефон получателя'; break;
-                case 'card': input.placeholder = 'Номер карты получателя'; break;
-            }
+    function register() {
+        const userData = {
+            name: document.getElementById('regName').value,
+            lastName: document.getElementById('regLastName').value,
+            email: document.getElementById('regEmail').value,
+            phone: document.getElementById('regPhone').value,
+            password: document.getElementById('regPassword').value
+        };
+        
+        // Перезагружаем пользователей
+        DB.users = JSON.parse(localStorage.getItem('abank_users'));
+        
+        if (DB.users.find(u => u.email === userData.email)) {
+            showNotification('❌ Email уже занят', 'error');
+            return;
         }
+        
+        const newUser = {
+            id: 'user_' + Date.now(),
+            ...userData,
+            balance: 1000,
+            role: 'user',
+            cards: [],
+            status: 'active',
+            verified: false,
+            rank: 'STANDARD',
+            passport: null
+        };
+        
+        DB.users.push(newUser);
+        DB.session = { userId: newUser.id };
+        currentUser = newUser;
+        
+        const bonusOperation = {
+            id: 'op_' + Date.now(),
+            type: 'welcome_bonus',
+            userId: newUser.id,
+            amount: 1000,
+            description: 'Приветственный бонус за регистрацию',
+            at: new Date().toISOString()
+        };
+        
+        DB.operations.push(bonusOperation);
+        saveData();
+        updateUI();
+        showNotification('🎁 Аккаунт создан! На ваш счет зачислен бонус 1000 ₽');
+    }
 
-        function makeTransfer() {
-            const recipientId = document.getElementById('transferRecipient').value;
-            const amount = parseFloat(document.getElementById('transferAmount').value);
-            const description = document.getElementById('transferDesc').value;
-            
-            let recipient;
-            
-            // Поиск получателя по email, телефону или карте
-            switch(transferType) {
-                case 'email':
-                    recipient = DB.users.find(u => u.email === recipientId);
-                    break;
-                case 'phone':
-                    recipient = DB.users.find(u => u.phone === recipientId);
-                    break;
-                case 'card':
-                    recipient = DB.users.find(u => 
-                        u.cards.some(card => card.number.replace(/\s/g, '') === recipientId.replace(/\s/g, ''))
-                    );
-                    break;
-            }
-            
-            if (!recipient) {
-                showNotification('❌ Получатель не найден', 'error');
-                return;
-            }
-            
-            if (currentUser.balance < amount) {
-                showNotification('❌ Недостаточно средств', 'error');
-                return;
-            }
-            
-            // Выполняем перевод
-            currentUser.balance -= amount;
-            recipient.balance += amount;
-            
-            const transferOperation = {
-                id: 'op_' + Date.now(),
-                type: 'transfer',
-                fromId: currentUser.id,
-                toId: recipient.id,
-                amount: amount,
-                description: description,
-                at: new Date().toISOString()
-            };
-            
-            DB.operations.push(transferOperation);
-            saveData();
-            updateUI();
-            showNotification(`✅ Перевод на ${amount} ₽ выполнен!`);
-            showSection('dashboard');
+    function setTransferType(type) {
+        transferType = type;
+        document.querySelectorAll('.transfer-option').forEach(opt => {
+            opt.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        const input = document.getElementById('transferRecipient');
+        switch(type) {
+            case 'email': input.placeholder = 'Email получателя'; break;
+            case 'phone': input.placeholder = 'Телефон получателя'; break;
+            case 'card': input.placeholder = 'Номер карты получателя'; break;
         }
+    }
 
-        function applyCard() {
-            if (!currentUser.passport) {
-                showNotification('❌ Для выпуска карты нужны паспортные данные', 'error');
-                showSection('profile');
-                return;
-            }
-            
-            if (!currentUser.verified) {
-                showNotification('❌ Требуется верификация аккаунта', 'error');
-                return;
-            }
-            
-            const cardNumber = '5536 ' + Math.floor(1000 + Math.random() * 9000) + ' ' + 
-                Math.floor(1000 + Math.random() * 9000) + ' ' + Math.floor(1000 + Math.random() * 9000);
-                
-            const newCard = {
-                id: 'card_' + Date.now(),
-                number: cardNumber,
-                type: currentUser.rank === 'PREMIUM' ? 'Mastercard Platinum' : 'Visa Classic',
-                balance: currentUser.balance,
-                issuedAt: new Date().toISOString()
-            };
-            
-            currentUser.cards.push(newCard);
-            saveData();
-            updateUI();
-            showNotification(`💳 ${newCard.type} выпущена: ${cardNumber}`);
+    function makeTransfer() {
+        const recipientId = document.getElementById('transferRecipient').value;
+        const amount = parseFloat(document.getElementById('transferAmount').value);
+        const description = document.getElementById('transferDesc').value;
+        
+        // Перезагружаем данные
+        DB.users = JSON.parse(localStorage.getItem('abank_users'));
+        currentUser = DB.users.find(u => u.id === currentUser.id);
+        
+        let recipient;
+        
+        switch(transferType) {
+            case 'email':
+                recipient = DB.users.find(u => u.email === recipientId);
+                break;
+            case 'phone':
+                recipient = DB.users.find(u => u.phone === recipientId);
+                break;
+            case 'card':
+                recipient = DB.users.find(u => 
+                    u.cards.some(card => card.number.replace(/\s/g, '') === recipientId.replace(/\s/g, ''))
+                );
+                break;
         }
-
-        function showPassportModal() {
-            document.getElementById('passportModal').classList.add('active');
+        
+        if (!recipient) {
+            showNotification('❌ Получатель не найден', 'error');
+            return;
         }
-
-        function closePassportModal() {
-            document.getElementById('passportModal').classList.remove('active');
+        
+        if (currentUser.balance < amount) {
+            showNotification('❌ Недостаточно средств', 'error');
+            return;
         }
+        
+        currentUser.balance -= amount;
+        recipient.balance += amount;
+        
+        const transferOperation = {
+            id: 'op_' + Date.now(),
+            type: 'transfer',
+            fromId: currentUser.id,
+            toId: recipient.id,
+            amount: amount,
+            description: description,
+            at: new Date().toISOString()
+        };
+        
+        DB.operations.push(transferOperation);
+        saveData();
+        updateUI();
+        showNotification(`✅ Перевод на ${amount} ₽ выполнен!`);
+        showSection('dashboard');
+    }
 
-        function savePassport() {
-            const passportData = {
-                series: document.getElementById('passportSeries').value,
-                number: document.getElementById('passportNumber').value,
-                issued: document.getElementById('passportIssued').value,
-                issueDate: document.getElementById('passportDate').value,
-                divisionCode: document.getElementById('passportCode').value,
-                birthDate: document.getElementById('birthDate').value,
-                birthPlace: document.getElementById('birthPlace').value
-            };
-            
-            if (!passportData.series || !passportData.number) {
-                showNotification('❌ Заполните серию и номер паспорта', 'error');
-                return;
-            }
-            
-            currentUser.passport = passportData;
-            saveData();
-            closePassportModal();
-            showNotification('✅ Паспортные данные сохранены');
-            loadProfile();
+    function applyCard() {
+        // Перезагружаем данные
+        DB.users = JSON.parse(localStorage.getItem('abank_users'));
+        currentUser = DB.users.find(u => u.id === currentUser.id);
+        
+        if (!currentUser.passport) {
+            showNotification('❌ Для выпуска карты нужны паспортные данные', 'error');
+            showSection('profile');
+            return;
         }
-
-        function verifyAccount() {
-            if (!currentUser.passport) {
-                showNotification('❌ Сначала добавьте паспортные данные', 'error');
-                return;
-            }
-            
-            showNotification('📋 Запрос на верификацию отправлен администратору');
+        
+        if (!currentUser.verified) {
+            showNotification('❌ Требуется верификация аккаунта', 'error');
+            return;
         }
+        
+        const cardNumber = '5536 ' + Math.floor(1000 + Math.random() * 9000) + ' ' + 
+            Math.floor(1000 + Math.random() * 9000) + ' ' + Math.floor(1000 + Math.random() * 9000);
+            
+        const newCard = {
+            id: 'card_' + Date.now(),
+            number: cardNumber,
+            type: currentUser.rank === 'PREMIUM' ? 'Mastercard Platinum' : 'Visa Classic',
+            balance: currentUser.balance,
+            issuedAt: new Date().toISOString()
+        };
+        
+        currentUser.cards.push(newCard);
+        saveData();
+        updateUI();
+        showNotification(`💳 ${newCard.type} выпущена: ${cardNumber}`);
+    }
 
-        function loadProfile() {
-            if (!currentUser) return;
-            
-            document.getElementById('profileName').textContent = `${currentUser.name} ${currentUser.lastName}`;
-            document.getElementById('profileEmail').textContent = currentUser.email;
-            document.getElementById('profilePhone').textContent = currentUser.phone;
-            
-            const verificationBadge = document.getElementById('profileVerification');
-            if (currentUser.verified) {
-                verificationBadge.textContent = 'ВЕРИФИЦИРОВАН';
-                verificationBadge.style.background = '#51cf66';
-                document.getElementById('verifyBtn').style.display = 'none';
-            } else {
-                verificationBadge.textContent = 'НЕ ВЕРИФИЦИРОВАН';
-                verificationBadge.style.background = '#ff6b6b';
-                document.getElementById('verifyBtn').style.display = 'inline-block';
-            }
-            
-            if (currentUser.passport) {
-                document.getElementById('passportBtn').textContent = '✏️ Изменить паспортные данные';
-            }
+    function showPassportModal() {
+        document.getElementById('passportModal').classList.add('active');
+    }
+
+    function closePassportModal() {
+        document.getElementById('passportModal').classList.remove('active');
+    }
+
+    function savePassport() {
+        const passportData = {
+            series: document.getElementById('passportSeries').value,
+            number: document.getElementById('passportNumber').value,
+            issued: document.getElementById('passportIssued').value,
+            issueDate: document.getElementById('passportDate').value,
+            divisionCode: document.getElementById('passportCode').value,
+            birthDate: document.getElementById('birthDate').value,
+            birthPlace: document.getElementById('birthPlace').value
+        };
+        
+        if (!passportData.series || !passportData.number) {
+            showNotification('❌ Заполните серию и номер паспорта', 'error');
+            return;
         }
+        
+        // Перезагружаем данные
+        DB.users = JSON.parse(localStorage.getItem('abank_users'));
+        currentUser = DB.users.find(u => u.id === currentUser.id);
+        
+        currentUser.passport = passportData;
+        saveData();
+        closePassportModal();
+        showNotification('✅ Паспортные данные сохранены');
+        loadProfile();
+    }
 
-        function loadAdminPanel() {
-            if (!currentUser || currentUser.role !== 'admin') return;
-            
-            document.getElementById('adminTotalUsers').textContent = DB.users.length;
-            document.getElementById('adminVerifiedUsers').textContent = DB.users.filter(u => u.verified).length;
-            document.getElementById('adminTotalCards').textContent = DB.users.reduce((sum, user) => sum + user.cards.length, 0);
-            document.getElementById('adminTotalBalance').textContent = 
-                DB.users.reduce((sum, user) => sum + user.balance, 0) + ' ₽';
-            
-            const userList = document.getElementById('adminUserList');
-            userList.innerHTML = DB.users.map(user => `
-                <div class="operation-item">
-                    <div class="operation-icon">${user.role === 'admin' ? '👑' : '👤'}</div>
-                    <div class="operation-details">
-                        <div class="operation-main">
-                            <div class="operation-title">
-                                ${user.name} ${user.lastName}
-                                ${user.role === 'admin' ? '<span class="admin-badge">ADMIN</span>' : ''}
-                                ${user.verified ? '<span class="verified-badge">VERIFIED</span>' : ''}
-                            </div>
-                            <div class="operation-amount">${user.balance} ₽</div>
+    function verifyAccount() {
+        if (!currentUser.passport) {
+            showNotification('❌ Сначала добавьте паспортные данные', 'error');
+            return;
+        }
+        
+        showNotification('📋 Запрос на верификацию отправлен администратору');
+    }
+
+    function loadProfile() {
+        if (!currentUser) return;
+        
+        document.getElementById('profileName').textContent = `${currentUser.name} ${currentUser.lastName}`;
+        document.getElementById('profileEmail').textContent = currentUser.email;
+        document.getElementById('profilePhone').textContent = currentUser.phone;
+        
+        const verificationBadge = document.getElementById('profileVerification');
+        if (currentUser.verified) {
+            verificationBadge.textContent = 'ВЕРИФИЦИРОВАН';
+            verificationBadge.style.background = '#51cf66';
+            document.getElementById('verifyBtn').style.display = 'none';
+        } else {
+            verificationBadge.textContent = 'НЕ ВЕРИФИЦИРОВАН';
+            verificationBadge.style.background = '#ff6b6b';
+            document.getElementById('verifyBtn').style.display = 'inline-block';
+        }
+        
+        if (currentUser.passport) {
+            document.getElementById('passportBtn').textContent = '✏️ Изменить паспортные данные';
+        }
+    }
+
+    function loadAdminPanel() {
+        if (!currentUser || currentUser.role !== 'admin') return;
+        
+        // Перезагружаем данные
+        DB.users = JSON.parse(localStorage.getItem('abank_users'));
+        
+        document.getElementById('adminTotalUsers').textContent = DB.users.length;
+        document.getElementById('adminVerifiedUsers').textContent = DB.users.filter(u => u.verified).length;
+        document.getElementById('adminTotalCards').textContent = DB.users.reduce((sum, user) => sum + user.cards.length, 0);
+        document.getElementById('adminTotalBalance').textContent = 
+            DB.users.reduce((sum, user) => sum + user.balance, 0) + ' ₽';
+        
+        const userList = document.getElementById('adminUserList');
+        userList.innerHTML = DB.users.map(user => `
+            <div class="operation-item">
+                <div class="operation-icon">${user.role === 'admin' ? '👑' : '👤'}</div>
+                <div class="operation-details">
+                    <div class="operation-main">
+                        <div class="operation-title">
+                            ${user.name} ${user.lastName}
+                            ${user.role === 'admin' ? '<span class="admin-badge">ADMIN</span>' : ''}
+                            ${user.verified ? '<span class="verified-badge">VERIFIED</span>' : ''}
                         </div>
-                        <div class="operation-description">
-                            ${user.email} • ${user.phone}
-                            ${user.passport ? '• 🆔 Паспорт' : '• ❌ Без паспорта'}
-                        </div>
+                        <div class="operation-amount">${user.balance} ₽</div>
                     </div>
-                    <div style="display: flex; gap: 5px;">
-                        ${user.role !== 'admin' ? 
-                            `<button class="receipt-btn" onclick="makeAdmin('${user.id}')">👑 Сделать админом</button>` : 
-                            ''
-                        }
-                        ${!user.verified ? 
-                            `<button class="receipt-btn" onclick="verifyUser('${user.id}')" style="background: var(--success); border-color: var(--success);">✅ Верифицировать</button>` : 
-                            ''
-                        }
+                    <div class="operation-description">
+                        ${user.email} • ${user.phone}
+                        ${user.passport ? '• 🆔 Паспорт' : '• ❌ Без паспорта'}
                     </div>
                 </div>
-            `).join('');
-        }
+                <div style="display: flex; gap: 5px;">
+                    ${user.role !== 'admin' ? 
+                        `<button class="receipt-btn" onclick="makeAdmin('${user.id}')">👑 Сделать админом</button>` : 
+                        ''
+                    }
+                    ${!user.verified ? 
+                        `<button class="receipt-btn" onclick="verifyUser('${user.id}')" style="background: var(--success); border-color: var(--success);">✅ Верифицировать</button>` : 
+                        ''
+                    }
+                </div>
+            </div>
+        `).join('');
+    }
 
-        function makeAdmin(userId) {
-            const user = DB.users.find(u => u.id === userId);
-            if (user) {
-                user.role = 'admin';
-                user.rank = 'ADMIN';
-                saveData();
-                loadAdminPanel();
-                showNotification(`👑 ${user.name} теперь администратор`);
-            }
-        }
-
-        function verifyUser(userId) {
-            const user = DB.users.find(u => u.id === userId);
-            if (user) {
-                user.verified = true;
-                saveData();
-                loadAdminPanel();
-                showNotification(`✅ ${user.name} верифицирован`);
-            }
-        }
-
-        function loadDashboard() {
-            if (!currentUser) return;
-            
-            document.getElementById('statCards').textContent = currentUser.cards.length;
-            document.getElementById('statMonthlyOps').textContent = 
-                DB.operations.filter(op => op.fromId === currentUser.id).length;
-            document.getElementById('statVerification').textContent = currentUser.verified ? 'ДА' : 'НЕТ';
-            document.getElementById('statStatus').textContent = currentUser.rank;
-            document.getElementById('userRank').textContent = currentUser.rank;
-            
-            const recentOps = DB.operations
-                .filter(op => op.userId === currentUser.id || op.fromId === currentUser.id || op.toId === currentUser.id)
-                .slice(-4)
-                .reverse();
-            
-            const container = document.getElementById('recentOperations');
-            container.innerHTML = recentOps.length ? recentOps.map(op => {
-                const isOutgoing = op.fromId === currentUser.id;
-                return `
-                    <div class="operation-item">
-                        <div class="operation-icon">${isOutgoing ? '💸' : '💰'}</div>
-                        <div class="operation-details">
-                            <div class="operation-main">
-                                <div class="operation-title">${op.description}</div>
-                                <div class="operation-amount ${isOutgoing ? 'negative' : 'positive'}">
-                                    ${isOutgoing ? '-' : '+'}${op.amount || 0} ₽
-                                </div>
-                            </div>
-                            <div class="operation-date">${new Date(op.at).toLocaleString('ru-RU')}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('') : '<div style="text-align: center; color: #666; padding: 40px;">Операций пока нет</div>';
-        }
-
-        function loadHistory() {
-            const container = document.getElementById('operationsList');
-            if (!currentUser) return;
-            
-            const userOps = DB.operations.filter(op => 
-                op.userId === currentUser.id || op.fromId === currentUser.id || op.toId === currentUser.id
-            );
-            
-            container.innerHTML = userOps.length ? userOps.map(op => {
-                const isOutgoing = op.fromId === currentUser.id;
-                return `
-                    <div class="operation-item">
-                        <div class="operation-icon">${isOutgoing ? '💸' : '💰'}</div>
-                        <div class="operation-details">
-                            <div class="operation-main">
-                                <div class="operation-title">${op.description}</div>
-                                <div class="operation-amount ${isOutgoing ? 'negative' : 'positive'}">
-                                    ${isOutgoing ? '-' : '+'}${op.amount || 0} ₽
-                                </div>
-                            </div>
-                            <div class="operation-date">${new Date(op.at).toLocaleString('ru-RU')}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('') : '<div style="text-align: center; color: #666; padding: 40px;">Операций пока нет</div>';
-        }
-
-        function updateUI() {
-            const nav = document.getElementById('nav');
-            const greeting = document.getElementById('userGreeting');
-            const details = document.getElementById('userDetails');
-            const welcome = document.getElementById('userWelcome');
-            const balance = document.getElementById('userBalance');
-            const adminBtn = document.getElementById('adminBtn');
-            
-            if (currentUser) {
-                nav.style.display = 'block';
-                greeting.textContent = `${currentUser.name} ${currentUser.lastName}`;
-                details.textContent = currentUser.email;
-                welcome.textContent = `Добро пожаловать, ${currentUser.name}!`;
-                balance.textContent = `${currentUser.balance} ₽`;
-                
-                if (currentUser.role === 'admin') {
-                    adminBtn.style.display = 'block';
-                } else {
-                    adminBtn.style.display = 'none';
-                }
-                
-                showSection('dashboard');
-            } else {
-                nav.style.display = 'none';
-                greeting.textContent = 'Войдите в систему';
-                details.textContent = 'Для доступа к банкингу';
-                showSection('login');
-            }
-        }
-
-        function logout() {
-            currentUser = null;
-            DB.session = null;
+    function makeAdmin(userId) {
+        // Перезагружаем данные
+        DB.users = JSON.parse(localStorage.getItem('abank_users'));
+        
+        const user = DB.users.find(u => u.id === userId);
+        if (user) {
+            user.role = 'admin';
+            user.rank = 'ADMIN';
             saveData();
-            updateUI();
-            showNotification('👋 Выход выполнен');
+            loadAdminPanel();
+            showNotification(`👑 ${user.name} теперь администратор`);
         }
+    }
 
-        // Инициализация
-        function init() {
-            if (DB.session) {
-                currentUser = DB.users.find(u => u.id === DB.session.userId);
+    function verifyUser(userId) {
+        // Перезагружаем данные
+        DB.users = JSON.parse(localStorage.getItem('abank_users'));
+        
+        const user = DB.users.find(u => u.id === userId);
+        if (user) {
+            user.verified = true;
+            saveData();
+            loadAdminPanel();
+            showNotification(`✅ ${user.name} верифицирован`);
+        }
+    }
+
+    function loadDashboard() {
+        if (!currentUser) return;
+        
+        // Перезагружаем данные
+        DB.users = JSON.parse(localStorage.getItem('abank_users'));
+        DB.operations = JSON.parse(localStorage.getItem('abank_operations'));
+        currentUser = DB.users.find(u => u.id === currentUser.id);
+        
+        document.getElementById('statCards').textContent = currentUser.cards.length;
+        document.getElementById('statMonthlyOps').textContent = 
+            DB.operations.filter(op => op.fromId === currentUser.id).length;
+        document.getElementById('statVerification').textContent = currentUser.verified ? 'ДА' : 'НЕТ';
+        document.getElementById('statStatus').textContent = currentUser.rank;
+        document.getElementById('userRank').textContent = currentUser.rank;
+        
+        const recentOps = DB.operations
+            .filter(op => op.userId === currentUser.id || op.fromId === currentUser.id || op.toId === currentUser.id)
+            .slice(-4)
+            .reverse();
+        
+        const container = document.getElementById('recentOperations');
+        container.innerHTML = recentOps.length ? recentOps.map(op => {
+            const isOutgoing = op.fromId === currentUser.id;
+            return `
+                <div class="operation-item">
+                    <div class="operation-icon">${isOutgoing ? '💸' : '💰'}</div>
+                    <div class="operation-details">
+                        <div class="operation-main">
+                            <div class="operation-title">${op.description}</div>
+                            <div class="operation-amount ${isOutgoing ? 'negative' : 'positive'}">
+                                ${isOutgoing ? '-' : '+'}${op.amount || 0} ₽
+                            </div>
+                        </div>
+                        <div class="operation-date">${new Date(op.at).toLocaleString('ru-RU')}</div>
+                    </div>
+                </div>
+            `;
+        }).join('') : '<div style="text-align: center; color: #666; padding: 40px;">Операций пока нет</div>';
+    }
+
+    function loadHistory() {
+        const container = document.getElementById('operationsList');
+        if (!currentUser) return;
+        
+        // Перезагружаем данные
+        DB.operations = JSON.parse(localStorage.getItem('abank_operations'));
+        
+        const userOps = DB.operations.filter(op => 
+            op.userId === currentUser.id || op.fromId === currentUser.id || op.toId === currentUser.id
+        );
+        
+        container.innerHTML = userOps.length ? userOps.map(op => {
+            const isOutgoing = op.fromId === currentUser.id;
+            return `
+                <div class="operation-item">
+                    <div class="operation-icon">${isOutgoing ? '💸' : '💰'}</div>
+                    <div class="operation-details">
+                        <div class="operation-main">
+                            <div class="operation-title">${op.description}</div>
+                            <div class="operation-amount ${isOutgoing ? 'negative' : 'positive'}">
+                                ${isOutgoing ? '-' : '+'}${op.amount || 0} ₽
+                            </div>
+                        </div>
+                        <div class="operation-date">${new Date(op.at).toLocaleString('ru-RU')}</div>
+                    </div>
+                </div>
+            `;
+        }).join('') : '<div style="text-align: center; color: #666; padding: 40px;">Операций пока нет</div>';
+    }
+
+    function updateUI() {
+        const nav = document.getElementById('nav');
+        const greeting = document.getElementById('userGreeting');
+        const details = document.getElementById('userDetails');
+        const welcome = document.getElementById('userWelcome');
+        const balance = document.getElementById('userBalance');
+        const adminBtn = document.getElementById('adminBtn');
+        
+        if (currentUser) {
+            nav.style.display = 'block';
+            greeting.textContent = `${currentUser.name} ${currentUser.lastName}`;
+            details.textContent = currentUser.email;
+            welcome.textContent = `Добро пожаловать, ${currentUser.name}!`;
+            balance.textContent = `${currentUser.balance} ₽`;
+            
+            if (currentUser.role === 'admin') {
+                adminBtn.style.display = 'block';
+            } else {
+                adminBtn.style.display = 'none';
             }
-            updateUI();
+            
+            showSection('dashboard');
+        } else {
+            nav.style.display = 'none';
+            greeting.textContent = 'Войдите в систему';
+            details.textContent = 'Для доступа к банкингу';
+            showSection('login');
         }
+    }
 
-        init();
-    </script>
+    function logout() {
+        currentUser = null;
+        DB.session = null;
+        saveData();
+        updateUI();
+        showNotification('👋 Выход выполнен');
+    }
+
+    // Инициализация с принудительным созданием админа
+    function init() {
+        // Всегда пересоздаем админа при запуске
+        initializeDB();
+        
+        if (DB.session) {
+            DB.users = JSON.parse(localStorage.getItem('abank_users'));
+            currentUser = DB.users.find(u => u.id === DB.session.userId);
+        }
+        updateUI();
+    }
+
+    // Кнопка сброса базы данных (для отладки)
+    function resetDatabase() {
+        localStorage.clear();
+        initializeDB();
+        currentUser = null;
+        updateUI();
+        showNotification('🗃️ База данных сброшена! Админ создан заново.');
+    }
+
+    init();
+</script>
 </body>
 </html>
