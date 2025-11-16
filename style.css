@@ -1,4 +1,3 @@
-/* Основные стили */
 :root {
     --primary-gradient: linear-gradient(135deg, #ffd94d 0%, #ff5a5a 50%, #7a4cff 100%);
     --card-bg: rgba(255, 255, 255, 0.95);
@@ -158,6 +157,12 @@ body {
 
 .content-section.active {
     display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* Карточки */
@@ -544,14 +549,4 @@ body {
     .actions-grid {
         grid-template-columns: repeat(3, 1fr);
     }
-}
-
-/* Анимации */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.content-section.active {
-    animation: fadeIn 0.3s ease;
 }
