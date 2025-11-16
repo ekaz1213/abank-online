@@ -21,42 +21,42 @@
                     <div id="userDetails" class="user-details">Для доступа к банкингу</div>
                 </div>
 
-                <!-- Навигация для пользователя -->
+                <!-- Навигация -->
                 <div id="userNav" class="nav-section" style="display: none;">
-                    <button class="nav-btn" onclick="showSection('dashboard')">
+                    <button class="nav-btn" data-section="dashboard">
                         <span class="nav-icon">📊</span>
                         Дашборд
                     </button>
-                    <button class="nav-btn" onclick="showSection('transfer')">
+                    <button class="nav-btn" data-section="transfer">
                         <span class="nav-icon">💸</span>
                         Перевод
                     </button>
-                    <button class="nav-btn" onclick="showSection('cards')">
+                    <button class="nav-btn" data-section="cards">
                         <span class="nav-icon">💳</span>
                         Карты
                     </button>
-                    <button class="nav-btn" onclick="showSection('history')">
+                    <button class="nav-btn" data-section="history">
                         <span class="nav-icon">📈</span>
                         История
                     </button>
-                    <button class="nav-btn logout-btn" onclick="logout()">
+                    <button class="nav-btn logout-btn" id="logoutBtn">
                         <span class="nav-icon">🚪</span>
                         Выйти
                     </button>
                 </div>
 
-                <!-- Навигация для админа -->
+                <!-- Админ панель -->
                 <div id="adminNav" class="nav-section" style="display: none;">
                     <div class="nav-title">Админ панель</div>
-                    <button class="nav-btn" onclick="showSection('adminUsers')">
+                    <button class="nav-btn" data-section="adminUsers">
                         <span class="nav-icon">👥</span>
                         Пользователи
                     </button>
-                    <button class="nav-btn" onclick="showSection('adminPassports')">
+                    <button class="nav-btn" data-section="adminPassports">
                         <span class="nav-icon">📋</span>
                         Паспорта
                     </button>
-                    <button class="nav-btn" onclick="showSection('adminOperations')">
+                    <button class="nav-btn" data-section="adminOperations">
                         <span class="nav-icon">📊</span>
                         Операции
                     </button>
@@ -65,8 +65,8 @@
 
             <!-- Основной контент -->
             <div class="main-content">
-                <!-- Экран входа -->
-                <div id="loginScreen" class="content-section active">
+                <!-- Вход -->
+                <div id="loginSection" class="content-section active">
                     <div class="welcome-card">
                         <div class="welcome-icon">🏦</div>
                         <h1>Добро пожаловать в А БАНК</h1>
@@ -89,15 +89,15 @@
                                 Войти
                             </button>
                         </form>
-                        <button class="auth-btn secondary" onclick="showSection('register')">
+                        <button class="auth-btn secondary" id="showRegisterBtn">
                             <span class="btn-icon">📝</span>
                             Создать аккаунт
                         </button>
                     </div>
                 </div>
 
-                <!-- Экран регистрации -->
-                <div id="registerScreen" class="content-section">
+                <!-- Регистрация -->
+                <div id="registerSection" class="content-section">
                     <div class="auth-card">
                         <h2>Создание аккаунта</h2>
                         <form id="registerForm" class="auth-form">
@@ -128,7 +128,7 @@
                                 Создать аккаунт
                             </button>
                         </form>
-                        <button class="auth-btn secondary" onclick="showSection('login')">
+                        <button class="auth-btn secondary" id="showLoginBtn">
                             <span class="btn-icon">↩️</span>
                             Назад к входу
                         </button>
@@ -136,7 +136,7 @@
                 </div>
 
                 <!-- Дашборд -->
-                <div id="dashboardScreen" class="content-section">
+                <div id="dashboardSection" class="content-section">
                     <div class="dashboard-header">
                         <div id="userAvatar" class="user-avatar">UI</div>
                         <div class="user-welcome">
@@ -171,15 +171,15 @@
                     <div class="quick-actions">
                         <h3>Быстрые действия</h3>
                         <div class="actions-grid">
-                            <div class="action-card" onclick="showSection('transfer')">
+                            <div class="action-card" data-section="transfer">
                                 <div class="action-icon">💸</div>
                                 <div class="action-text">Перевод</div>
                             </div>
-                            <div class="action-card" onclick="showSection('cards')">
+                            <div class="action-card" data-section="cards">
                                 <div class="action-icon">💳</div>
                                 <div class="action-text">Карты</div>
                             </div>
-                            <div class="action-card" onclick="showSection('history')">
+                            <div class="action-card" data-section="history">
                                 <div class="action-icon">📈</div>
                                 <div class="action-text">История</div>
                             </div>
@@ -192,7 +192,7 @@
                 </div>
 
                 <!-- Переводы -->
-                <div id="transferScreen" class="content-section">
+                <div id="transferSection" class="content-section">
                     <div class="section-header">
                         <h2>💸 Перевод средств</h2>
                         <p>Безопасный перевод любым удобным способом</p>
@@ -252,9 +252,46 @@
                     </div>
                 </div>
 
-                <!-- Остальные секции (карты, история, админ-панель) -->
-                <div id="otherScreens">
-                    <!-- Здесь будут другие экраны -->
+                <!-- Другие секции -->
+                <div id="cardsSection" class="content-section">
+                    <div class="section-header">
+                        <h2>💳 Мои карты</h2>
+                        <p>Управление вашими банковскими картами</p>
+                    </div>
+                    <div id="cardsList"></div>
+                </div>
+
+                <div id="historySection" class="content-section">
+                    <div class="section-header">
+                        <h2>📈 История операций</h2>
+                        <p>Все ваши финансовые операции</p>
+                    </div>
+                    <div id="operationsList"></div>
+                </div>
+
+                <!-- Админ секции -->
+                <div id="adminUsersSection" class="content-section">
+                    <div class="section-header">
+                        <h2>👥 Управление пользователями</h2>
+                        <p>Администрирование пользователей системы</p>
+                    </div>
+                    <div id="usersList"></div>
+                </div>
+
+                <div id="adminPassportsSection" class="content-section">
+                    <div class="section-header">
+                        <h2>📋 Управление паспортами</h2>
+                        <p>Верификация паспортных данных</p>
+                    </div>
+                    <div id="passportsList"></div>
+                </div>
+
+                <div id="adminOperationsSection" class="content-section">
+                    <div class="section-header">
+                        <h2>📊 Все операции</h2>
+                        <p>Мониторинг всех операций в системе</p>
+                    </div>
+                    <div id="allOperationsList"></div>
                 </div>
             </div>
         </div>
@@ -262,6 +299,7 @@
 
     <div id="notificationContainer"></div>
 
+    <script src="database.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
