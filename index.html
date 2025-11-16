@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>А БАНК — Онлайн банкинг</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <div class="sidebar">
+            <div class="logo">
+                А БАНК <span class="dot">online</span>
+            </div>
+            
+            <div id="userSummary" class="user-card">
+                <div id="greeting">Войдите в систему</div>
+                <div id="smallInfo" class="muted">Онлайн банкинг 24/7</div>
+            </div>
+
+            <div id="nav" style="display: none;">
+                <button class="nav-button" data-action="dashboard">📊 Дашборд</button>
+                <button class="nav-button" data-action="transfer">💸 Перевод</button>
+                <button class="nav-button" data-action="card">💳 Карты</button>
+                <button class="nav-button" data-action="history">📈 История</button>
+                <button id="logoutBtn" class="nav-button logout-btn">🚪 Выйти</button>
+            </div>
+
+            <div id="adminNav" style="display: none; margin-top: 20px;">
+                <div class="muted" style="margin-bottom: 12px;">⚙️ Админ панель</div>
+                <button class="nav-button" data-action="admin_users">👥 Пользователи</button>
+                <button class="nav-button" data-action="admin_passports">📋 Паспорта</button>
+                <button class="nav-button" data-action="admin_ops">📊 Операции</button>
+            </div>
+        </div>
+
+        <div class="main">
+            <div id="authView" class="card">
+                <h2>Вход в систему</h2>
+                <form id="loginForm">
+                    <label>
+                        <div>Электронная почта</div>
+                        <input type="email" id="loginEmail" required placeholder="you@example.com" />
+                    </label>
+                    <label>
+                        <div>Пароль</div>
+                        <input type="password" id="loginPass" required placeholder="••••••••" />
+                    </label>
+                    <div class="actions">
+                        <button type="submit">🔐 Войти</button>
+                        <button type="button" id="showRegister" class="btn-secondary">📝 Регистрация</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="registerView" class="card" style="display: none;">
+                <h2>Создание аккаунта</h2>
+                <form id="regForm">
+                    <label>
+                        <div>Имя</div>
+                        <input id="regName" required placeholder="Иван Иванов" />
+                    </label>
+                    <label>
+                        <div>Email</div>
+                        <input id="regEmail" type="email" required placeholder="ivan@example.com" />
+                    </label>
+                    <label>
+                        <div>Пароль</div>
+                        <input id="regPass" type="password" required placeholder="Минимум 6 символов" />
+                    </label>
+                    <div class="actions">
+                        <button type="submit">🚀 Создать аккаунт</button>
+                        <button type="button" id="showLogin" class="btn-secondary">↩️ Назад</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="contentArea">
+                <div class="card">
+                    <h3>Добро пожаловать в А БАНК</h3>
+                    <p class="muted">Войдите в систему для доступа к онлайн банкингу</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
