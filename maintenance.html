@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>А БАНК - Технические работы</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #ffd94d 0%, #ff5a5a 50%, #7a4cff 100%);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .maintenance-card {
+            background: rgba(255,255,255,0.95);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+        }
+        .logo {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 20px;
+        }
+        .dot {
+            background: black;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 10px;
+            margin-left: 10px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .message {
+            color: #666;
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .timer {
+            background: #ff5a5a;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="maintenance-card">
+        <div class="logo">
+            А БАНК <span class="dot">online</span>
+        </div>
+        <h1>🛠️ Технические работы</h1>
+        <div class="message">
+            В настоящее время проводятся плановые технические работы.<br>
+            Система будет доступна в ближайшее время.<br>
+            Приносим извинения за временные неудобства.
+        </div>
+        <div class="timer" id="timer">
+            Ожидаемое время восстановления: <span id="time">45 минут</span>
+        </div>
+        <div style="color: #888; font-size: 14px;">
+            Обновлено: <span id="updateTime"></span>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('updateTime').textContent = new Date().toLocaleString('ru-RU');
+        
+        // Таймер обратного отсчета (опционально)
+        let minutes = 45;
+        const timerElement = document.getElementById('time');
+        
+        const countdown = setInterval(() => {
+            minutes--;
+            if (minutes <= 0) {
+                timerElement.textContent = 'скоро';
+                clearInterval(countdown);
+            } else {
+                timerElement.textContent = minutes + ' минут';
+            }
+        }, 60000);
+    </script>
+</body>
+</html>
