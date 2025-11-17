@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#764ba2">
     <title>А БАНК - Премиум Банкинг</title>
     <style>
         * { 
@@ -1028,19 +1030,21 @@
         }
 
         // Логин и регистрация
-        function login() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const user = users.find(u => u.email === email && u.password === password);
-            
-            if (user) {
-                currentUser = user;
-                updateUI();
-                showView('dashboard');
-            } else {
-                alert('❌ Неверный email или пароль');
-            }
-        }
+      function login() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const user = users.find(u => u.email === email && u.password === password);
+    
+    if (user) {
+        currentUser = user;
+        // СОХРАНЯЕМ пользователя для авто-входа
+        localStorage.setItem('abank_last_user', user.id);
+        updateUI();
+        showView('dashboard');
+    } else {
+        alert('❌ Неверный email или пароль');
+    }
+} 
 
         function register() {
             const userData = {
@@ -1772,13 +1776,29 @@
             }
         }
 
-        function logout() {
-            currentUser = null;
-            showView('login');
-        }
+     function logout() {
+    // НЕ очищаем localStorage, только текущую сессию
+    currentUser = null;
+    showView('login');
+}
 
-        // Запуск
-        showView('login');
+        // Автоматический вход при загрузке
+function checkAuth() {
+    const lastUserId = localStorage.getItem('abank_last_user');
+    if (lastUserId) {
+        const user = users.find(u => u.id === lastUserId);
+        if (user) {
+            currentUser = user;
+            updateUI();
+            showView('dashboard');
+            return;
+        }
+    }
+    showView('login');
+}
+
+// Запуск
+checkAuth();
     </script>
 </body>
 </html>
