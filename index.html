@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#764ba2">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#764ba2">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="А БАНК">
     <title>А БАНК - Премиум Банкинг</title>
     <style>
         * { 
@@ -1797,6 +1803,13 @@ function checkAuth() {
     showView('login');
 }
 
+   // Регистрация Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js')
+    .then(reg => console.log('Service Worker registered'))
+    .catch(err => console.log('Service Worker not registered', err));
+}
+        
 // Запуск
 checkAuth();
     </script>
