@@ -233,6 +233,10 @@
             background: linear-gradient(135deg, #ef4444, #dc2626);
         }
         
+        .badge-premium {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        
         .hidden {
             display: none !important;
         }
@@ -354,6 +358,41 @@
             margin-bottom: 15px;
         }
         
+        .card-type-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .card-option {
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .card-option.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .card-option.premium {
+            border-color: #f59e0b;
+        }
+        
+        .card-option.premium.selected {
+            background: #fef3c7;
+        }
+        
+        .card-price {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 5px;
+        }
+        
         @media (max-width: 480px) {
             .content {
                 padding: 20px;
@@ -428,7 +467,7 @@
                             <div style="font-size: 20px; margin-bottom: 5px;">💸</div>
                             Перевод
                         </div>
-                        <div class="nav-btn" onclick="applyCard()">
+                        <div class="nav-btn" onclick="showCardSelection()">
                             <div style="font-size: 20px; margin-bottom: 5px;">💳</div>
                             Карта
                         </div>
@@ -449,6 +488,11 @@
                             Админ
                         </div>
                     </div>
+                </div>
+                
+                <div class="card">
+                    <h4 style="margin-bottom: 15px;">💳 Мои карты</h4>
+                    <div id="cardsList">Карт пока нет</div>
                 </div>
                 
                 <div class="card">
@@ -492,7 +536,8 @@
                 <div class="card">
                     <h3 style="text-align: center; margin-bottom: 20px;">👤 Мой профиль</h3>
                     <div id="profileInfo">Загрузка...</div>
-                    <button onclick="showPassportModal()">🆔 Паспортные данные</button>
+                    <button onclick="confirmPassport()" id="confirmPassportBtn" class="hidden">✅ Подтвердить паспорт</button>
+                    <button onclick="showPassportModal()" id="addPassportBtn">🆔 Добавить паспорт</button>
                     <button class="btn-success" onclick="requestVerification()" id="verifyBtn">✅ Запросить верификацию</button>
                     <button class="btn-secondary" onclick="showView('dashboard')">← Назад</button>
                 </div>
@@ -537,6 +582,7 @@
                     </div>
 
                     <button onclick="showModal('usersModal')">👥 Управление пользователями</button>
+                    <button onclick="showModal('passportAdminModal')" class="btn-warning">🆔 Добавить паспорт</button>
                     <button onclick="showModal('promoModal')" class="btn-success">🎫 Создать промокод</button>
                     <button onclick="resetDB()" class="btn-danger">🗑️ Сброс базы данных</button>
                     <button class="btn-secondary" onclick="showView('dashboard')">← Назад</button>
@@ -556,6 +602,47 @@
             <div style="display: flex; gap: 10px;">
                 <button onclick="savePassport()">💾 Сохранить</button>
                 <button class="btn-secondary" onclick="closeModal('passportModal')">❌ Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="passportAdminModal">
+        <div class="modal-content">
+            <h3 style="text-align: center; margin-bottom: 20px;">🆔 Добавить паспорт пользователю</h3>
+            <select id="adminUserSelect">
+                <option value="">Выберите пользователя</option>
+            </select>
+            <input type="text" id="adminPassportSeries" placeholder="Серия паспорта" maxlength="4">
+            <input type="text" id="adminPassportNumber" placeholder="Номер паспорта" maxlength="6">
+            <input type="text" id="adminPassportIssued" placeholder="Кем выдан">
+            <input type="text" id="adminPassportCode" placeholder="Код подразделения">
+            <div style="display: flex; gap: 10px;">
+                <button onclick="adminSavePassport()">💾 Добавить паспорт</button>
+                <button class="btn-secondary" onclick="closeModal('passportAdminModal')">❌ Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="cardSelectionModal">
+        <div class="modal-content">
+            <h3 style="text-align: center; margin-bottom: 20px;">💳 Выбор типа карты</h3>
+            
+            <div class="card-type-selector">
+                <div class="card-option" onclick="selectCardType('standard')">
+                    <div style="font-size: 24px; margin-bottom: 10px;">💳</div>
+                    <strong>Visa Classic</strong>
+                    <div class="card-price">99 ₽/мес</div>
+                </div>
+                <div class="card-option premium" onclick="selectCardType('premium')">
+                    <div style="font-size: 24px; margin-bottom: 10px;">💎</div>
+                    <strong>Mastercard Premium</strong>
+                    <div class="card-price">299 ₽/мес</div>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+                <button onclick="applySelectedCard()">💳 Выпустить карту</button>
+                <button class="btn-secondary" onclick="closeModal('cardSelectionModal')">❌ Отмена</button>
             </div>
         </div>
     </div>
@@ -592,6 +679,7 @@
         let promoCodes = JSON.parse(localStorage.getItem('abank_promos')) || [];
         let currentUser = null;
         let transferType = 'email';
+        let selectedCardType = 'standard';
 
         // Создаем тестового пользователя и админа если нет
         if (users.length === 0) {
@@ -601,7 +689,8 @@
                 email: 'user@example.com', phone: '+79991112233',
                 password: 'user123', balance: 5000,
                 role: 'user', cards: [], verified: false,
-                passport: null, activePromos: []
+                passport: null, passportConfirmed: false,
+                activePromos: []
             });
             
             users.push({
@@ -610,7 +699,7 @@
                 email: 'admin@abank.ru', phone: '+79990000000',
                 password: 'Admin123!', balance: 100000,
                 role: 'admin', cards: [], verified: true,
-                passport: {series: '0000', number: '000000'},
+                passport: {series: '0000', number: '000000'}, passportConfirmed: true,
                 activePromos: []
             });
             
@@ -650,6 +739,7 @@
 
         function showModal(modalId) {
             if (modalId === 'usersModal') loadUsersList();
+            if (modalId === 'passportAdminModal') loadUsersForPassport();
             document.getElementById(modalId).style.display = 'flex';
         }
 
@@ -688,7 +778,7 @@
             const newUser = {
                 id: 'user_' + Date.now(), ...userData,
                 balance: 500, role: 'user', cards: [],
-                verified: false, passport: null,
+                verified: false, passport: null, passportConfirmed: false,
                 activePromos: []
             };
             
@@ -754,35 +844,63 @@
         }
 
         // Карты
-        function applyCard() {
+        function showCardSelection() {
             if (!currentUser.passport) {
                 alert('❌ Для выпуска карты нужны паспортные данные'); 
                 showView('profile'); 
                 return;
             }
-            if (!currentUser.verified) {
-                alert('❌ Требуется верификация аккаунта'); 
+            if (!currentUser.passportConfirmed) {
+                alert('❌ Подтвердите паспортные данные в профиле'); 
+                showView('profile');
                 return;
             }
             
+            showModal('cardSelectionModal');
+        }
+
+        function selectCardType(type) {
+            selectedCardType = type;
+            document.querySelectorAll('.card-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        function applySelectedCard() {
+            const cardCost = selectedCardType === 'premium' ? 299 : 99;
+            
+            if (currentUser.balance < cardCost) {
+                alert(`❌ Недостаточно средств для оплаты карты (${cardCost} ₽)`);
+                return;
+            }
+            
+            currentUser.balance -= cardCost;
+            
             const cardNumber = '5536 ' + Math.floor(1000 + Math.random() * 9000);
+            const cardType = selectedCardType === 'premium' ? 'Mastercard Premium' : 'Visa Classic';
+            
             currentUser.cards.push({
                 number: cardNumber, 
-                type: currentUser.role === 'admin' ? 'Mastercard Platinum' : 'Visa Classic',
-                issuedAt: new Date().toISOString()
+                type: cardType,
+                tier: selectedCardType,
+                issuedAt: new Date().toISOString(),
+                cost: cardCost
             });
             
             operations.push({
                 id: 'op_' + Date.now(), 
                 type: 'card_issue',
                 userId: currentUser.id, 
-                amount: 0,
-                description: 'Выпуск банковской карты',
+                amount: -cardCost,
+                description: `Выпуск ${cardType}`,
                 at: new Date().toISOString()
             });
             
             saveData();
-            alert(`💳 Карта выпущена: ${cardNumber}`);
+            closeModal('cardSelectionModal');
+            updateUI();
+            alert(`💳 ${cardType} выпущена: ${cardNumber}`);
         }
 
         // Паспорт и верификация
@@ -804,18 +922,73 @@
             }
             
             currentUser.passport = passportData;
+            currentUser.passportConfirmed = false; // Требует подтверждения
             saveData();
             closeModal('passportModal');
             loadProfile();
-            alert('✅ Паспортные данные сохранены');
+            alert('✅ Паспортные данные сохранены. Требуется подтверждение.');
+        }
+
+        function confirmPassport() {
+            if (!currentUser.passport) {
+                alert('❌ Нет данных паспорта для подтверждения');
+                return;
+            }
+            
+            currentUser.passportConfirmed = true;
+            saveData();
+            loadProfile();
+            alert('✅ Паспортные данные подтверждены!');
         }
 
         function requestVerification() {
-            if (!currentUser.passport) {
-                alert('❌ Сначала добавьте паспортные данные'); 
+            if (!currentUser.passport || !currentUser.passportConfirmed) {
+                alert('❌ Сначала добавьте и подтвердите паспортные данные'); 
                 return;
             }
             alert('📋 Запрос на верификацию отправлен администратору');
+        }
+
+        // Админ функции для паспортов
+        function loadUsersForPassport() {
+            const select = document.getElementById('adminUserSelect');
+            select.innerHTML = '<option value="">Выберите пользователя</option>';
+            
+            users.filter(user => user.role !== 'admin').forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = `${user.name} ${user.lastName} (${user.email})`;
+                select.appendChild(option);
+            });
+        }
+
+        function adminSavePassport() {
+            const userId = document.getElementById('adminUserSelect').value;
+            const passportData = {
+                series: document.getElementById('adminPassportSeries').value,
+                number: document.getElementById('adminPassportNumber').value,
+                issued: document.getElementById('adminPassportIssued').value,
+                code: document.getElementById('adminPassportCode').value
+            };
+            
+            if (!userId) {
+                alert('❌ Выберите пользователя');
+                return;
+            }
+            
+            if (!passportData.series || !passportData.number) {
+                alert('❌ Заполните серию и номер паспорта'); 
+                return;
+            }
+            
+            const user = users.find(u => u.id === userId);
+            if (user) {
+                user.passport = passportData;
+                user.passportConfirmed = true; // Автоматически подтвержден админом
+                saveData();
+                closeModal('passportAdminModal');
+                alert(`✅ Паспортные данные добавлены для ${user.name}`);
+            }
         }
 
         // Промокоды
@@ -940,6 +1113,7 @@
                         <strong>${user.name} ${user.lastName}</strong>
                         <div style="font-size: 12px; color: #666;">${user.email}</div>
                         <div>Баланс: ${user.balance} ₽</div>
+                        <div>Паспорт: ${user.passport ? (user.passportConfirmed ? '✅ Подтвержден' : '⏳ Ожидает') : '❌ Нет'}</div>
                     </div>
                     <div class="user-actions">
                         ${!user.verified ? `<button class="action-btn btn-success" onclick="verifyUser('${user.id}')">✅</button>` : ''}
@@ -978,6 +1152,25 @@
 
         // Загрузка данных
         function loadDashboard() {
+            // Загрузка карт
+            const cardsContainer = document.getElementById('cardsList');
+            if (currentUser.cards.length === 0) {
+                cardsContainer.innerHTML = '<div class="operation">Карт пока нет</div>';
+            } else {
+                cardsContainer.innerHTML = currentUser.cards.map(card => `
+                    <div class="operation">
+                        <div>
+                            <strong>${card.type}</strong>
+                            <div style="font-size: 12px; color: #666;">${card.number}</div>
+                        </div>
+                        <span class="badge ${card.tier === 'premium' ? 'badge-premium' : ''}">
+                            ${card.tier === 'premium' ? 'PREMIUM' : 'STANDARD'}
+                        </span>
+                    </div>
+                `).join('');
+            }
+            
+            // Загрузка операций
             const userOps = operations.filter(op => 
                 op.userId === currentUser.id || op.fromId === currentUser.id
             ).slice(-3).reverse();
@@ -1027,9 +1220,20 @@
                     <div><strong>Верификация:</strong> ${currentUser.verified ? '✅ Верифицирован' : '❌ Не верифицирован'}</div>
                 </div>
                 <div class="operation">
-                    <div><strong>Паспорт:</strong> ${currentUser.passport ? '✅ Добавлен' : '❌ Не добавлен'}</div>
+                    <div><strong>Паспорт:</strong> ${currentUser.passport ? 
+                        (currentUser.passportConfirmed ? '✅ Подтвержден' : '⏳ Ожидает подтверждения') : 
+                        '❌ Не добавлен'}</div>
                 </div>
             `;
+            
+            // Показываем кнопку подтверждения только если паспорт есть но не подтвержден
+            if (currentUser.passport && !currentUser.passportConfirmed) {
+                document.getElementById('confirmPassportBtn').classList.remove('hidden');
+                document.getElementById('addPassportBtn').classList.add('hidden');
+            } else {
+                document.getElementById('confirmPassportBtn').classList.add('hidden');
+                document.getElementById('addPassportBtn').classList.remove('hidden');
+            }
             
             document.getElementById('verifyBtn').style.display = 
                 currentUser.verified ? 'none' : 'block';
