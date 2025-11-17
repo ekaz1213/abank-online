@@ -68,7 +68,7 @@
             Приносим извинения за временные неудобства.
         </div>
         <div class="timer" id="timer">
-            Ожидаемое время восстановления: <span id="time">45 минут</span>
+            Ожидаемое время восстановления: <span id="time">25 минут</span>
         </div>
         <div style="color: #888; font-size: 14px;">
             Обновлено: <span id="updateTime"></span>
@@ -79,7 +79,7 @@
         document.getElementById('updateTime').textContent = new Date().toLocaleString('ru-RU');
         
         // Таймер обратного отсчета (опционально)
-        let minutes = 45;
+        let minutes = 25;
         const timerElement = document.getElementById('time');
         
         const countdown = setInterval(() => {
