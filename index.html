@@ -3,157 +3,384 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>А БАНК</title>
+    <title>А БАНК - Премиум Банкинг</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
         body { 
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            color: #2d3748;
         }
+        
         .app {
             width: 100%;
-            max-width: 500px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 480px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 25px;
+            text-align: center;
+            position: relative;
             overflow: hidden;
         }
-        .header {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 25px 20px;
-            text-align: center;
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.1;
         }
+        
         .logo {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            position: relative;
         }
+        
+        .subtitle {
+            opacity: 0.9;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
         .content {
-            padding: 20px;
-            max-height: 600px;
+            padding: 25px;
+            max-height: 70vh;
             overflow-y: auto;
         }
+        
         .card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 15px;
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+        }
+        
         input, select, textarea {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
-            margin-bottom: 12px;
+            padding: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 16px;
             font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8fafc;
         }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+        
         button {
             width: 100%;
-            background: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 12px;
-            border-radius: 10px;
+            padding: 16px;
+            border-radius: 12px;
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
         .btn-secondary {
             background: #6c757d;
         }
+        
         .btn-success {
-            background: #28a745;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         }
+        
         .btn-warning {
-            background: #ffc107;
-            color: black;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
         .balance {
-            font-size: 28px;
-            font-weight: bold;
-            color: #2d3748;
-            margin: 8px 0;
+            font-size: 36px;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 12px 0;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .nav {
+        
+        .nav-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 15px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 20px;
         }
+        
         .nav-btn {
             background: white;
-            border: 2px solid #e1e5e9;
-            padding: 12px;
-            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            padding: 20px 12px;
+            border-radius: 16px;
             text-align: center;
             cursor: pointer;
             font-size: 14px;
-            color: #2d3748; /* Исправлен цвет текста */
+            color: #2d3748;
+            transition: all 0.3s ease;
+            font-weight: 600;
         }
+        
+        .nav-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        
         .operation {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px;
-            background: white;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            border-left: 4px solid #667eea;
-        }
-        .badge {
-            background: #667eea;
-            color: white;
-            padding: 4px 8px;
+            padding: 16px;
+            background: #f8fafc;
             border-radius: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+        
+        .operation:hover {
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
             font-size: 12px;
+            font-weight: 700;
             margin-left: 8px;
         }
-        .hidden {
-            display: none;
+        
+        .badge-success {
+            background: linear-gradient(135deg, #10b981, #059669);
         }
+        
+        .badge-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        
+        .badge-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
         .tabs {
             display: flex;
-            gap: 5px;
-            margin-bottom: 15px;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: #f8fafc;
+            padding: 6px;
+            border-radius: 12px;
         }
+        
         .tab {
             flex: 1;
-            padding: 10px;
+            padding: 12px;
             text-align: center;
-            background: #e9ecef;
+            background: transparent;
             border-radius: 8px;
             cursor: pointer;
-            color: #2d3748; /* Исправлен цвет текста */
+            color: #64748b;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
+        
         .tab.active {
-            background: #667eea;
-            color: white;
+            background: white;
+            color: #667eea;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
+        
         .modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 1000;
+            padding: 20px;
         }
+        
         .modal-content {
             background: white;
-            padding: 20px;
-            border-radius: 15px;
-            width: 90%;
+            padding: 30px;
+            border-radius: 20px;
+            width: 100%;
             max-width: 400px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            margin: 8px 0;
+        }
+        
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            width: auto;
+        }
+        
+        .promo-card {
+            background: linear-gradient(135deg, #f0f4ff, #f8fafc);
+            border: 2px dashed #cbd5e1;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 480px) {
+            .content {
+                padding: 20px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .nav-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 25px 20px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .app {
+                max-width: 500px;
+            }
         }
     </style>
 </head>
@@ -161,63 +388,81 @@
     <div class="app">
         <div class="header">
             <div class="logo">А БАНК</div>
-            <div>Премиум банкинг</div>
+            <div class="subtitle">Премиум Банкинг</div>
         </div>
         
         <div class="content">
             <!-- Логин -->
             <div id="loginView">
                 <div class="card">
-                    <h3>Вход в систему</h3>
-                    <input type="email" id="loginEmail" placeholder="Email" value="admin@abank.ru">
-                    <input type="password" id="loginPassword" placeholder="Пароль" value="Admin123!">
-                    <button onclick="login()">Войти</button>
-                    <button class="btn-secondary" onclick="showView('register')">Регистрация</button>
+                    <h3 style="text-align: center; margin-bottom: 20px;">Вход в систему</h3>
+                    <input type="email" id="loginEmail" placeholder="Ваш email" value="user@example.com">
+                    <input type="password" id="loginPassword" placeholder="Пароль" value="user123">
+                    <button onclick="login()">🔐 Войти в систему</button>
+                    <button class="btn-secondary" onclick="showView('register')">✨ Создать аккаунт</button>
                 </div>
             </div>
 
             <!-- Регистрация -->
             <div id="registerView" class="hidden">
                 <div class="card">
-                    <h3>Регистрация <span class="badge">+1000₽</span></h3>
+                    <h3 style="text-align: center; margin-bottom: 20px;">Создание аккаунта <span class="badge">+500₽</span></h3>
                     <input type="text" id="regName" placeholder="Имя">
                     <input type="text" id="regLastName" placeholder="Фамилия">
                     <input type="email" id="regEmail" placeholder="Email">
                     <input type="tel" id="regPhone" placeholder="Телефон">
                     <input type="password" id="regPassword" placeholder="Пароль">
-                    <button onclick="register()">Создать аккаунт +1000₽</button>
-                    <button class="btn-secondary" onclick="showView('login')">Назад</button>
+                    <button onclick="register()">🎁 Создать аккаунт + 500₽</button>
+                    <button class="btn-secondary" onclick="showView('login')">← Назад к входу</button>
                 </div>
             </div>
 
             <!-- Дашборд -->
             <div id="dashboardView" class="hidden">
                 <div class="card">
-                    <h3 id="userWelcome">Добро пожаловать!</h3>
+                    <h3 id="userWelcome" style="text-align: center;">Добро пожаловать!</h3>
                     <div class="balance" id="userBalance">0 ₽</div>
                     
-                    <div class="nav">
-                        <div class="nav-btn" onclick="showView('transfer')">💸 Перевод</div>
-                        <div class="nav-btn" onclick="applyCard()">💳 Карта</div>
-                        <div class="nav-btn" onclick="showView('history')">📊 История</div>
-                        <div class="nav-btn" onclick="showView('profile')">👤 Профиль</div>
-                        <div class="nav-btn" onclick="showView('invest')">📈 Инвестиции</div>
-                        <div class="nav-btn" onclick="showView('admin')" id="adminNav">👑 Админ</div>
+                    <div class="nav-grid">
+                        <div class="nav-btn" onclick="showView('transfer')">
+                            <div style="font-size: 20px; margin-bottom: 5px;">💸</div>
+                            Перевод
+                        </div>
+                        <div class="nav-btn" onclick="applyCard()">
+                            <div style="font-size: 20px; margin-bottom: 5px;">💳</div>
+                            Карта
+                        </div>
+                        <div class="nav-btn" onclick="showView('history')">
+                            <div style="font-size: 20px; margin-bottom: 5px;">📊</div>
+                            История
+                        </div>
+                        <div class="nav-btn" onclick="showView('profile')">
+                            <div style="font-size: 20px; margin-bottom: 5px;">👤</div>
+                            Профиль
+                        </div>
+                        <div class="nav-btn" onclick="showView('promo')">
+                            <div style="font-size: 20px; margin-bottom: 5px;">🎫</div>
+                            Промокоды
+                        </div>
+                        <div class="nav-btn" onclick="showView('admin')" id="adminNav">
+                            <div style="font-size: 20px; margin-bottom: 5px;">👑</div>
+                            Админ
+                        </div>
                     </div>
                 </div>
                 
                 <div class="card">
-                    <h4>Последние операции</h4>
+                    <h4 style="margin-bottom: 15px;">📈 Последние операции</h4>
                     <div id="recentOperations">Операций пока нет</div>
                 </div>
                 
-                <button class="btn-secondary" onclick="logout()">Выйти</button>
+                <button class="btn-secondary" onclick="logout()">🚪 Выйти</button>
             </div>
 
             <!-- Переводы -->
             <div id="transferView" class="hidden">
                 <div class="card">
-                    <h3>Перевод средств</h3>
+                    <h3 style="text-align: center; margin-bottom: 20px;">💸 Перевод средств</h3>
                     
                     <div class="tabs">
                         <div class="tab active" onclick="setTransferType('email')">📧 Email</div>
@@ -225,88 +470,140 @@
                         <div class="tab" onclick="setTransferType('card')">💳 Карта</div>
                     </div>
                     
-                    <input type="text" id="transferTo" placeholder="Получатель">
-                    <input type="number" id="transferAmount" placeholder="Сумма">
-                    <input type="text" id="transferDesc" placeholder="Назначение">
-                    <button onclick="makeTransfer()">Перевести</button>
-                    <button class="btn-secondary" onclick="showView('dashboard')">Назад</button>
+                    <input type="text" id="transferTo" placeholder="Email получателя">
+                    <input type="number" id="transferAmount" placeholder="Сумма перевода">
+                    <input type="text" id="transferDesc" placeholder="Назначение платежа">
+                    <button onclick="makeTransfer()">🚀 Выполнить перевод</button>
+                    <button class="btn-secondary" onclick="showView('dashboard')">← Назад</button>
                 </div>
             </div>
 
             <!-- История -->
             <div id="historyView" class="hidden">
                 <div class="card">
-                    <h3>История операций</h3>
+                    <h3 style="text-align: center; margin-bottom: 20px;">📊 История операций</h3>
                     <div id="operationsList">Загрузка...</div>
-                    <button class="btn-secondary" onclick="showView('dashboard')">Назад</button>
+                    <button class="btn-secondary" onclick="showView('dashboard')">← Назад</button>
                 </div>
             </div>
 
             <!-- Профиль -->
             <div id="profileView" class="hidden">
                 <div class="card">
-                    <h3>Мой профиль</h3>
+                    <h3 style="text-align: center; margin-bottom: 20px;">👤 Мой профиль</h3>
                     <div id="profileInfo">Загрузка...</div>
                     <button onclick="showPassportModal()">🆔 Паспортные данные</button>
                     <button class="btn-success" onclick="requestVerification()" id="verifyBtn">✅ Запросить верификацию</button>
-                    <button class="btn-secondary" onclick="showView('dashboard')">Назад</button>
+                    <button class="btn-secondary" onclick="showView('dashboard')">← Назад</button>
                 </div>
             </div>
 
-            <!-- Инвестиции -->
-            <div id="investView" class="hidden">
+            <!-- Промокоды -->
+            <div id="promoView" class="hidden">
                 <div class="card">
-                    <h3>Инвестиции</h3>
-                    <div class="balance" id="investBalance">0 ₽</div>
-                    
-                    <div class="nav">
-                        <div class="nav-btn" onclick="buyStock('AAPL')">🍎 Apple</div>
-                        <div class="nav-btn" onclick="buyStock('TSLA')">🚗 Tesla</div>
-                        <div class="nav-btn" onclick="buyCrypto('BTC')">₿ Bitcoin</div>
-                        <div class="nav-btn" onclick="buyCrypto('ETH')">Ξ Ethereum</div>
+                    <h3 style="text-align: center; margin-bottom: 20px;">🎫 Промокоды</h3>
+                    <input type="text" id="promoCode" placeholder="Введите промокод">
+                    <button onclick="activatePromo()">🎁 Активировать промокод</button>
+                    <div id="activePromos" style="margin-top: 20px;">
+                        <h4>Активные промокоды:</h4>
+                        <div id="promosList">Промокодов нет</div>
                     </div>
-                    
-                    <button class="btn-secondary" onclick="showView('dashboard')">Назад</button>
+                    <button class="btn-secondary" onclick="showView('dashboard')">← Назад</button>
                 </div>
             </div>
 
             <!-- Админ -->
             <div id="adminView" class="hidden">
                 <div class="card">
-                    <h3>Админ панель</h3>
-                    <div id="adminStats">Загрузка...</div>
-                    <button onclick="loadUsers()">Управление пользователями</button>
-                    <button class="btn-warning" onclick="resetDB()">Сброс базы</button>
-                    <button class="btn-secondary" onclick="showView('dashboard')">Назад</button>
+                    <h3 style="text-align: center; margin-bottom: 20px;">👑 Админ панель</h3>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div>👥 Пользователи</div>
+                            <div class="stat-value" id="adminTotalUsers">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>✅ Верифицированы</div>
+                            <div class="stat-value" id="adminVerifiedUsers">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>💳 Карты</div>
+                            <div class="stat-value" id="adminTotalCards">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div>💰 Баланс</div>
+                            <div class="stat-value" id="adminTotalBalance">0₽</div>
+                        </div>
+                    </div>
+
+                    <button onclick="showModal('usersModal')">👥 Управление пользователями</button>
+                    <button onclick="showModal('promoModal')" class="btn-success">🎫 Создать промокод</button>
+                    <button onclick="resetDB()" class="btn-danger">🗑️ Сброс базы данных</button>
+                    <button class="btn-secondary" onclick="showView('dashboard')">← Назад</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Модальное окно паспорта -->
+    <!-- Модальные окна -->
     <div class="modal" id="passportModal">
         <div class="modal-content">
-            <h3>Паспортные данные</h3>
-            <input type="text" id="passportSeries" placeholder="Серия" maxlength="4">
-            <input type="text" id="passportNumber" placeholder="Номер" maxlength="6">
+            <h3 style="text-align: center; margin-bottom: 20px;">🆔 Паспортные данные</h3>
+            <input type="text" id="passportSeries" placeholder="Серия паспорта" maxlength="4">
+            <input type="text" id="passportNumber" placeholder="Номер паспорта" maxlength="6">
             <input type="text" id="passportIssued" placeholder="Кем выдан">
             <input type="text" id="passportCode" placeholder="Код подразделения">
             <div style="display: flex; gap: 10px;">
-                <button onclick="savePassport()">Сохранить</button>
-                <button class="btn-secondary" onclick="closeModal('passportModal')">Отмена</button>
+                <button onclick="savePassport()">💾 Сохранить</button>
+                <button class="btn-secondary" onclick="closeModal('passportModal')">❌ Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="usersModal">
+        <div class="modal-content">
+            <h3 style="text-align: center; margin-bottom: 20px;">👥 Управление пользователями</h3>
+            <div id="usersList" style="max-height: 300px; overflow-y: auto; margin-bottom: 20px;">
+                Загрузка...
+            </div>
+            <button class="btn-secondary" onclick="closeModal('usersModal')">❌ Закрыть</button>
+        </div>
+    </div>
+
+    <div class="modal" id="promoModal">
+        <div class="modal-content">
+            <h3 style="text-align: center; margin-bottom: 20px;">🎫 Создать промокод</h3>
+            <input type="text" id="promoName" placeholder="Название промокода">
+            <input type="text" id="promoCodeInput" placeholder="Код промокода">
+            <input type="number" id="promoAmount" placeholder="Сумма бонуса">
+            <input type="number" id="promoUses" placeholder="Количество использований">
+            <input type="date" id="promoExpires" placeholder="Действует до">
+            <div style="display: flex; gap: 10px;">
+                <button onclick="createPromo()">✨ Создать промокод</button>
+                <button class="btn-secondary" onclick="closeModal('promoModal')">❌ Отмена</button>
             </div>
         </div>
     </div>
 
     <script>
-        // База данных с СОВМЕСТИМОСТЬЮ старых данных
+        // База данных с совместимостью
         let users = JSON.parse(localStorage.getItem('abank_users')) || JSON.parse(localStorage.getItem('bank_users')) || [];
         let operations = JSON.parse(localStorage.getItem('abank_operations')) || JSON.parse(localStorage.getItem('bank_operations')) || [];
+        let promoCodes = JSON.parse(localStorage.getItem('abank_promos')) || [];
         let currentUser = null;
         let transferType = 'email';
 
-        // Создаем админа если нет
-        if (!users.find(u => u.email === 'admin@abank.ru')) {
+        // Создаем тестового пользователя и админа если нет
+        if (users.length === 0) {
+            users.push({
+                id: 'user_1',
+                name: 'Тестовый', lastName: 'Пользователь',
+                email: 'user@example.com', phone: '+79991112233',
+                password: 'user123', balance: 5000,
+                role: 'user', cards: [], verified: false,
+                passport: null, activePromos: []
+            });
+            
             users.push({
                 id: 'admin',
                 name: 'Админ', lastName: 'Системы',
@@ -314,17 +611,28 @@
                 password: 'Admin123!', balance: 100000,
                 role: 'admin', cards: [], verified: true,
                 passport: {series: '0000', number: '000000'},
-                investments: [], crypto: []
+                activePromos: []
             });
+            
+            // Создаем тестовые промокоды
+            promoCodes.push({
+                id: 'promo_1',
+                code: 'WELCOME500',
+                name: 'Приветственный бонус',
+                amount: 500,
+                maxUses: 100,
+                usedCount: 0,
+                expiresAt: '2024-12-31',
+                createdBy: 'admin'
+            });
+            
             saveData();
         }
 
         function saveData() {
-            // Сохраняем в оба ключа для совместимости
             localStorage.setItem('abank_users', JSON.stringify(users));
             localStorage.setItem('abank_operations', JSON.stringify(operations));
-            localStorage.setItem('bank_users', JSON.stringify(users));
-            localStorage.setItem('bank_operations', JSON.stringify(operations));
+            localStorage.setItem('abank_promos', JSON.stringify(promoCodes));
         }
 
         function showView(viewName) {
@@ -333,14 +641,15 @@
             });
             document.getElementById(viewName + 'View').classList.remove('hidden');
             
-            // Загружаем данные для view
             if (viewName === 'dashboard') loadDashboard();
             if (viewName === 'history') loadHistory();
             if (viewName === 'profile') loadProfile();
             if (viewName === 'admin') loadAdmin();
+            if (viewName === 'promo') loadPromos();
         }
 
         function showModal(modalId) {
+            if (modalId === 'usersModal') loadUsersList();
             document.getElementById(modalId).style.display = 'flex';
         }
 
@@ -358,7 +667,9 @@
                 currentUser = user;
                 updateUI();
                 showView('dashboard');
-            } else alert('Неверный email или пароль');
+            } else {
+                alert('❌ Неверный email или пароль');
+            }
         }
 
         function register() {
@@ -371,31 +682,30 @@
             };
             
             if (users.find(u => u.email === userData.email)) {
-                alert('Email уже занят'); return;
+                alert('❌ Email уже занят'); return;
             }
             
             const newUser = {
                 id: 'user_' + Date.now(), ...userData,
-                balance: 1000, role: 'user', cards: [],
+                balance: 500, role: 'user', cards: [],
                 verified: false, passport: null,
-                investments: [], crypto: []
+                activePromos: []
             };
             
             users.push(newUser);
             currentUser = newUser;
             
-            // Бонусная операция
             operations.push({
                 id: 'op_' + Date.now(), type: 'bonus',
-                userId: newUser.id, amount: 1000,
-                description: 'Приветственный бонус',
+                userId: newUser.id, amount: 500,
+                description: 'Приветственный бонус за регистрацию',
                 at: new Date().toISOString()
             });
             
             saveData();
             updateUI();
             showView('dashboard');
-            alert('Аккаунт создан! Бонус 1000 ₽');
+            alert('🎉 Аккаунт создан! Бонус 500 ₽ зачислен');
         }
 
         // Переводы
@@ -424,8 +734,8 @@
                 u.cards.some(c => c.number.includes(to))
             );
             
-            if (!recipient) { alert('Получатель не найден'); return; }
-            if (currentUser.balance < amount) { alert('Недостаточно средств'); return; }
+            if (!recipient) { alert('❌ Получатель не найден'); return; }
+            if (currentUser.balance < amount) { alert('❌ Недостаточно средств'); return; }
             
             currentUser.balance -= amount;
             recipient.balance += amount;
@@ -440,33 +750,39 @@
             saveData();
             updateUI();
             showView('dashboard');
-            alert(`Перевод ${amount} ₽ выполнен!`);
+            alert(`✅ Перевод ${amount} ₽ выполнен!`);
         }
 
         // Карты
         function applyCard() {
             if (!currentUser.passport) {
-                alert('Нужны паспортные данные'); showView('profile'); return;
+                alert('❌ Для выпуска карты нужны паспортные данные'); 
+                showView('profile'); 
+                return;
             }
             if (!currentUser.verified) {
-                alert('Требуется верификация'); return;
+                alert('❌ Требуется верификация аккаунта'); 
+                return;
             }
             
             const cardNumber = '5536 ' + Math.floor(1000 + Math.random() * 9000);
             currentUser.cards.push({
-                number: cardNumber, type: 'Visa Classic',
+                number: cardNumber, 
+                type: currentUser.role === 'admin' ? 'Mastercard Platinum' : 'Visa Classic',
                 issuedAt: new Date().toISOString()
             });
             
             operations.push({
-                id: 'op_' + Date.now(), type: 'card_issue',
-                userId: currentUser.id, amount: 0,
-                description: 'Выпуск карты',
+                id: 'op_' + Date.now(), 
+                type: 'card_issue',
+                userId: currentUser.id, 
+                amount: 0,
+                description: 'Выпуск банковской карты',
                 at: new Date().toISOString()
             });
             
             saveData();
-            alert(`Карта выпущена: ${cardNumber}`);
+            alert(`💳 Карта выпущена: ${cardNumber}`);
         }
 
         // Паспорт и верификация
@@ -483,82 +799,154 @@
             };
             
             if (!passportData.series || !passportData.number) {
-                alert('Заполните серию и номер'); return;
+                alert('❌ Заполните серию и номер паспорта'); 
+                return;
             }
             
             currentUser.passport = passportData;
             saveData();
             closeModal('passportModal');
             loadProfile();
-            alert('Паспортные данные сохранены');
+            alert('✅ Паспортные данные сохранены');
         }
 
         function requestVerification() {
             if (!currentUser.passport) {
-                alert('Сначала добавьте паспорт'); return;
+                alert('❌ Сначала добавьте паспортные данные'); 
+                return;
             }
-            alert('Запрос на верификацию отправлен админу');
+            alert('📋 Запрос на верификацию отправлен администратору');
         }
 
-        // Инвестиции
-        function buyStock(symbol) {
-            const prices = { AAPL: 15000, TSLA: 18000 };
-            const price = prices[symbol];
+        // Промокоды
+        function loadPromos() {
+            const container = document.getElementById('promosList');
+            if (!currentUser.activePromos || currentUser.activePromos.length === 0) {
+                container.innerHTML = '<div class="operation">Активных промокодов нет</div>';
+                return;
+            }
             
-            if (currentUser.balance >= price) {
-                currentUser.balance -= price;
-                if (!currentUser.investments) currentUser.investments = [];
-                currentUser.investments.push({ symbol, price, date: new Date() });
-                saveData();
-                updateUI();
-                alert(`Куплены акции ${symbol} за ${price} ₽`);
-            } else alert('Недостаточно средств');
+            container.innerHTML = currentUser.activePromos.map(promoId => {
+                const promo = promoCodes.find(p => p.id === promoId);
+                if (!promo) return '';
+                return `
+                    <div class="promo-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>${promo.name}</strong>
+                                <div style="font-size: 12px; color: #666;">Код: ${promo.code}</div>
+                            </div>
+                            <span class="badge badge-success">+${promo.amount}₽</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
-        function buyCrypto(coin) {
-            const prices = { BTC: 3500000, ETH: 250000 };
-            const price = prices[coin];
+        function activatePromo() {
+            const code = document.getElementById('promoCode').value.toUpperCase();
+            const promo = promoCodes.find(p => p.code === code);
             
-            if (currentUser.balance >= price) {
-                currentUser.balance -= price;
-                if (!currentUser.crypto) currentUser.crypto = [];
-                currentUser.crypto.push({ coin, price, date: new Date() });
-                saveData();
-                updateUI();
-                alert(`Куплена крипта ${coin} за ${price} ₽`);
-            } else alert('Недостаточно средств');
+            if (!promo) {
+                alert('❌ Промокод не найден'); 
+                return;
+            }
+            
+            if (promo.usedCount >= promo.maxUses) {
+                alert('❌ Промокод уже использован максимальное количество раз'); 
+                return;
+            }
+            
+            if (new Date(promo.expiresAt) < new Date()) {
+                alert('❌ Промокод просрочен'); 
+                return;
+            }
+            
+            if (currentUser.activePromos && currentUser.activePromos.includes(promo.id)) {
+                alert('❌ Вы уже активировали этот промокод'); 
+                return;
+            }
+            
+            // Активируем промокод
+            currentUser.balance += promo.amount;
+            if (!currentUser.activePromos) currentUser.activePromos = [];
+            currentUser.activePromos.push(promo.id);
+            promo.usedCount++;
+            
+            operations.push({
+                id: 'op_' + Date.now(), 
+                type: 'promo',
+                userId: currentUser.id, 
+                amount: promo.amount,
+                description: `Активация промокода: ${promo.name}`,
+                at: new Date().toISOString()
+            });
+            
+            saveData();
+            updateUI();
+            document.getElementById('promoCode').value = '';
+            loadPromos();
+            alert(`🎉 Промокод активирован! +${promo.amount} ₽ зачислены на счет`);
+        }
+
+        function createPromo() {
+            const name = document.getElementById('promoName').value;
+            const code = document.getElementById('promoCodeInput').value.toUpperCase();
+            const amount = Number(document.getElementById('promoAmount').value);
+            const maxUses = Number(document.getElementById('promoUses').value);
+            const expiresAt = document.getElementById('promoExpires').value;
+            
+            if (!name || !code || !amount || !maxUses || !expiresAt) {
+                alert('❌ Заполните все поля'); 
+                return;
+            }
+            
+            if (promoCodes.find(p => p.code === code)) {
+                alert('❌ Промокод с таким кодом уже существует'); 
+                return;
+            }
+            
+            const newPromo = {
+                id: 'promo_' + Date.now(),
+                code: code,
+                name: name,
+                amount: amount,
+                maxUses: maxUses,
+                usedCount: 0,
+                expiresAt: expiresAt,
+                createdBy: currentUser.id,
+                createdAt: new Date().toISOString()
+            };
+            
+            promoCodes.push(newPromo);
+            saveData();
+            closeModal('promoModal');
+            alert('✅ Промокод создан!');
         }
 
         // Админ функции
         function loadAdmin() {
-            const stats = `
-                <div class="operation">
-                    <div>Пользователи:</div><div>${users.length}</div>
-                </div>
-                <div class="operation">
-                    <div>Верифицированы:</div><div>${users.filter(u => u.verified).length}</div>
-                </div>
-                <div class="operation">
-                    <div>Общий баланс:</div><div>${users.reduce((sum, u) => sum + u.balance, 0)} ₽</div>
-                </div>
-            `;
-            document.getElementById('adminStats').innerHTML = stats;
+            document.getElementById('adminTotalUsers').textContent = users.length;
+            document.getElementById('adminVerifiedUsers').textContent = users.filter(u => u.verified).length;
+            document.getElementById('adminTotalCards').textContent = users.reduce((sum, user) => sum + user.cards.length, 0);
+            document.getElementById('adminTotalBalance').textContent = users.reduce((sum, user) => sum + user.balance, 0) + '₽';
         }
 
-        function loadUsers() {
-            let html = '<h4>Пользователи:</h4>';
-            users.forEach(user => {
-                html += `
-                <div class="operation">
+        function loadUsersList() {
+            const container = document.getElementById('usersList');
+            container.innerHTML = users.map(user => `
+                <div class="user-item">
                     <div>
-                        ${user.name} ${user.lastName}
-                        ${user.role === 'admin' ? '<span class="badge">ADMIN</span>' : ''}
-                        ${user.verified ? '<span class="badge">VERIFIED</span>' : ''}
+                        <strong>${user.name} ${user.lastName}</strong>
+                        <div style="font-size: 12px; color: #666;">${user.email}</div>
+                        <div>Баланс: ${user.balance} ₽</div>
                     </div>
-                    <div>${user.balance} ₽</div>
-                </div>`;
-            });
-            document.getElementById('adminStats').innerHTML = html;
+                    <div class="user-actions">
+                        ${!user.verified ? `<button class="action-btn btn-success" onclick="verifyUser('${user.id}')">✅</button>` : ''}
+                        ${user.role !== 'admin' ? `<button class="action-btn btn-warning" onclick="makeAdmin('${user.id}')">👑</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
         }
 
         function verifyUser(userId) {
@@ -566,8 +954,8 @@
             if (user) {
                 user.verified = true;
                 saveData();
-                loadUsers();
-                alert(`${user.name} верифицирован`);
+                loadUsersList();
+                alert(`✅ ${user.name} верифицирован`);
             }
         }
 
@@ -576,13 +964,13 @@
             if (user) {
                 user.role = 'admin';
                 saveData();
-                loadUsers();
-                alert(`${user.name} теперь админ`);
+                loadUsersList();
+                alert(`👑 ${user.name} теперь администратор`);
             }
         }
 
         function resetDB() {
-            if (confirm('Сбросить всю базу данных?')) {
+            if (confirm('⚠️ Вы уверены? Это удалит всех пользователей и операции!')) {
                 localStorage.clear();
                 location.reload();
             }
@@ -598,11 +986,11 @@
             container.innerHTML = userOps.length ? userOps.map(op => `
                 <div class="operation">
                     <div>${op.description}</div>
-                    <div style="color: ${op.amount > 0 ? 'green' : 'red'}">
+                    <div style="color: ${op.amount > 0 ? '#10b981' : '#ef4444'}; font-weight: 600;">
                         ${op.amount > 0 ? '+' : ''}${op.amount} ₽
                     </div>
                 </div>
-            `).join('') : 'Операций пока нет';
+            `).join('') : '<div class="operation">Операций пока нет</div>';
         }
 
         function loadHistory() {
@@ -614,21 +1002,33 @@
                 userOps.map(op => `
                     <div class="operation">
                         <div>${op.description}</div>
-                        <div style="color: ${op.amount > 0 ? 'green' : 'red'}">
+                        <div style="color: ${op.amount > 0 ? '#10b981' : '#ef4444'}; font-weight: 600;">
                             ${op.amount > 0 ? '+' : ''}${op.amount} ₽
                         </div>
                     </div>
-                `).join('') : 'Операций нет';
+                `).join('') : '<div class="operation">Операций пока нет</div>';
         }
 
         function loadProfile() {
             document.getElementById('profileInfo').innerHTML = `
-                <p><strong>Имя:</strong> ${currentUser.name} ${currentUser.lastName}</p>
-                <p><strong>Email:</strong> ${currentUser.email}</p>
-                <p><strong>Телефон:</strong> ${currentUser.phone}</p>
-                <p><strong>Баланс:</strong> ${currentUser.balance} ₽</p>
-                <p><strong>Верификация:</strong> ${currentUser.verified ? '✅' : '❌'}</p>
-                <p><strong>Паспорт:</strong> ${currentUser.passport ? '✅' : '❌'}</p>
+                <div class="operation">
+                    <div><strong>Имя:</strong> ${currentUser.name} ${currentUser.lastName}</div>
+                </div>
+                <div class="operation">
+                    <div><strong>Email:</strong> ${currentUser.email}</div>
+                </div>
+                <div class="operation">
+                    <div><strong>Телефон:</strong> ${currentUser.phone}</div>
+                </div>
+                <div class="operation">
+                    <div><strong>Баланс:</strong> ${currentUser.balance} ₽</div>
+                </div>
+                <div class="operation">
+                    <div><strong>Верификация:</strong> ${currentUser.verified ? '✅ Верифицирован' : '❌ Не верифицирован'}</div>
+                </div>
+                <div class="operation">
+                    <div><strong>Паспорт:</strong> ${currentUser.passport ? '✅ Добавлен' : '❌ Не добавлен'}</div>
+                </div>
             `;
             
             document.getElementById('verifyBtn').style.display = 
