@@ -1,7 +1,7 @@
 {
   "name": "А БАНК - Премиум Банкинг",
   "short_name": "А БАНК",
-  "description": "Банковская система с СБП платежами", 
+  "description": "Банковская система с СБП платежами",
   "start_url": "/abank-online/",
   "scope": "/abank-online/",
   "display": "standalone",
@@ -10,14 +10,14 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIGZpbGw9IiM2NjdlZWEiLz48dGV4dCB4PSI5NiIgeT0iOTYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iIGZpbGw9IndoaXRlIj7wn5GqPC90ZXh0Pjwvc3ZnPg==",
+      "src": "https://ekaz1213.github.io/abank-online/icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/png"
     },
     {
-      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIGZpbGw9IiM2NjdlZWEiLz48dGV4dCB4PSIyNTYiIHk9IjI1NiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE2MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iIGZpbGw9IndoaXRlIj7wn5GqPC90ZXh0Pjwvc3ZnPg==",
-      "sizes": "512x512", 
-      "type": "image/svg+xml"
+      "src": "https://ekaz1213.github.io/abank-online/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ]
 }
