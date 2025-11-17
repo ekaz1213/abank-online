@@ -372,11 +372,29 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #667eea;
+        }
+        
+        .card-option.premium::before {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
         }
         
         .card-option.selected {
             border-color: #667eea;
             background: #f0f4ff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
         }
         
         .card-option.premium {
@@ -385,12 +403,108 @@
         
         .card-option.premium.selected {
             background: #fef3c7;
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.2);
         }
         
         .card-price {
             font-size: 14px;
             color: #64748b;
             margin-top: 5px;
+        }
+        
+        .card-benefits {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        
+        .card-design {
+            width: 100%;
+            height: 160px;
+            border-radius: 12px;
+            margin: 15px 0;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .card-design.premium {
+            background: linear-gradient(135deg, #f59e0b, #d97706, #ef4444);
+        }
+        
+        .card-chip {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 30px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-radius: 5px;
+        }
+        
+        .card-number {
+            position: absolute;
+            bottom: 40px;
+            left: 20px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+        
+        .card-holder {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: white;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .card-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .requests-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .request-item {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .spb-code {
+            background: linear-gradient(135deg, #1e3a8a, #3730a3);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+        
+        .no-card-banner {
+            background: linear-gradient(135deg, #f0f4ff, #e0e7ff);
+            border: 2px dashed #c7d2fe;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            margin: 15px 0;
         }
         
         @media (max-width: 480px) {
@@ -445,13 +559,13 @@
             <!-- Регистрация -->
             <div id="registerView" class="hidden">
                 <div class="card">
-                    <h3 style="text-align: center; margin-bottom: 20px;">Создание аккаунта <span class="badge">+500₽</span></h3>
+                    <h3 style="text-align: center; margin-bottom: 20px;">Создание аккаунта</h3>
                     <input type="text" id="regName" placeholder="Имя">
                     <input type="text" id="regLastName" placeholder="Фамилия">
                     <input type="email" id="regEmail" placeholder="Email">
                     <input type="tel" id="regPhone" placeholder="Телефон">
                     <input type="password" id="regPassword" placeholder="Пароль">
-                    <button onclick="register()">🎁 Создать аккаунт + 500₽</button>
+                    <button onclick="register()">🎁 Создать аккаунт</button>
                     <button class="btn-secondary" onclick="showView('login')">← Назад к входу</button>
                 </div>
             </div>
@@ -462,14 +576,24 @@
                     <h3 id="userWelcome" style="text-align: center;">Добро пожаловать!</h3>
                     <div class="balance" id="userBalance">0 ₽</div>
                     
+                    <!-- Баннер "Оформи карту" если нет карт -->
+                    <div id="noCardBanner" class="no-card-banner hidden">
+                        <div style="font-size: 48px; margin-bottom: 10px;">💳</div>
+                        <h4 style="margin-bottom: 10px;">Получите свою первую карту!</h4>
+                        <p style="color: #64748b; margin-bottom: 15px;">Откройте все возможности банкинга</p>
+                        <button onclick="showCardSelection()" style="width: auto; padding: 10px 20px;">
+                            🎉 Оформить карту
+                        </button>
+                    </div>
+                    
                     <div class="nav-grid">
                         <div class="nav-btn" onclick="showView('transfer')">
                             <div style="font-size: 20px; margin-bottom: 5px;">💸</div>
                             Перевод
                         </div>
-                        <div class="nav-btn" onclick="showCardSelection()">
-                            <div style="font-size: 20px; margin-bottom: 5px;">💳</div>
-                            Карта
+                        <div class="nav-btn" onclick="showView('spb')">
+                            <div style="font-size: 20px; margin-bottom: 5px;">🔗</div>
+                            СПБ
                         </div>
                         <div class="nav-btn" onclick="showView('history')">
                             <div style="font-size: 20px; margin-bottom: 5px;">📊</div>
@@ -522,6 +646,37 @@
                 </div>
             </div>
 
+            <!-- СПБ Платежи -->
+            <div id="spbView" class="hidden">
+                <div class="card">
+                    <h3 style="text-align: center; margin-bottom: 20px;">🔗 Система быстрых платежей</h3>
+                    
+                    <div class="tabs">
+                        <div class="tab active" onclick="setSPBMode('generate')">🎫 Создать код</div>
+                        <div class="tab" onclick="setSPBMode('use')">💳 Использовать код</div>
+                    </div>
+                    
+                    <div id="spbGenerateSection">
+                        <input type="number" id="spbAmount" placeholder="Сумма перевода">
+                        <input type="text" id="spbDescription" placeholder="Описание платежа">
+                        <button onclick="generateSPBCode()">✨ Сгенерировать код СПБ</button>
+                        <div id="spbCodeResult" class="hidden">
+                            <div class="spb-code" id="spbCodeDisplay">SPB-XXXX-XXXX</div>
+                            <p style="text-align: center; color: #64748b; font-size: 14px;">
+                                Покажите этот код для получения платежа
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div id="spbUseSection" class="hidden">
+                        <input type="text" id="spbCodeInput" placeholder="Введите код СПБ">
+                        <button onclick="useSPBCode()">💸 Получить платеж</button>
+                    </div>
+                    
+                    <button class="btn-secondary" onclick="showView('dashboard')">← Назад</button>
+                </div>
+            </div>
+
             <!-- История -->
             <div id="historyView" class="hidden">
                 <div class="card">
@@ -536,7 +691,6 @@
                 <div class="card">
                     <h3 style="text-align: center; margin-bottom: 20px;">👤 Мой профиль</h3>
                     <div id="profileInfo">Загрузка...</div>
-                    <button onclick="confirmPassport()" id="confirmPassportBtn" class="hidden">✅ Подтвердить паспорт</button>
                     <button onclick="showPassportModal()" id="addPassportBtn">🆔 Добавить паспорт</button>
                     <button class="btn-success" onclick="requestVerification()" id="verifyBtn">✅ Запросить верификацию</button>
                     <button class="btn-secondary" onclick="showView('dashboard')">← Назад</button>
@@ -581,10 +735,28 @@
                         </div>
                     </div>
 
-                    <button onclick="showModal('usersModal')">👥 Управление пользователями</button>
-                    <button onclick="showModal('passportAdminModal')" class="btn-warning">🆔 Добавить паспорт</button>
-                    <button onclick="showModal('promoModal')" class="btn-success">🎫 Создать промокод</button>
-                    <button onclick="resetDB()" class="btn-danger">🗑️ Сброс базы данных</button>
+                    <div class="tabs">
+                        <div class="tab active" onclick="setAdminTab('users')">👥 Пользователи</div>
+                        <div class="tab" onclick="setAdminTab('requests')">📋 Запросы</div>
+                        <div class="tab" onclick="setAdminTab('tools')">🛠️ Инструменты</div>
+                    </div>
+
+                    <div id="adminUsersTab">
+                        <button onclick="showModal('usersModal')">Управление пользователями</button>
+                        <button onclick="showModal('passportAdminModal')" class="btn-warning">🆔 Добавить паспорт</button>
+                    </div>
+
+                    <div id="adminRequestsTab" class="hidden">
+                        <div class="requests-list" id="requestsList">
+                            Загрузка запросов...
+                        </div>
+                    </div>
+
+                    <div id="adminToolsTab" class="hidden">
+                        <button onclick="showModal('promoModal')" class="btn-success">🎫 Создать промокод</button>
+                        <button onclick="resetDB()" class="btn-danger">🗑️ Сброс базы данных</button>
+                    </div>
+
                     <button class="btn-secondary" onclick="showView('dashboard')">← Назад</button>
                 </div>
             </div>
@@ -625,18 +797,27 @@
 
     <div class="modal" id="cardSelectionModal">
         <div class="modal-content">
-            <h3 style="text-align: center; margin-bottom: 20px;">💳 Выбор типа карты</h3>
+            <h3 style="text-align: center; margin-bottom: 20px;">💳 Выбор карты</h3>
+            
+            <div class="card-design" id="cardPreview">
+                <div class="card-chip"></div>
+                <div class="card-number">•••• •••• •••• ••••</div>
+                <div class="card-holder">CARDHOLDER NAME</div>
+                <div class="card-logo" id="cardLogo">VISA</div>
+            </div>
             
             <div class="card-type-selector">
                 <div class="card-option" onclick="selectCardType('standard')">
                     <div style="font-size: 24px; margin-bottom: 10px;">💳</div>
                     <strong>Visa Classic</strong>
                     <div class="card-price">99 ₽/мес</div>
+                    <div class="card-benefits">Кэшбэк 1% • Бесплатные переводы</div>
                 </div>
                 <div class="card-option premium" onclick="selectCardType('premium')">
                     <div style="font-size: 24px; margin-bottom: 10px;">💎</div>
                     <strong>Mastercard Premium</strong>
                     <div class="card-price">299 ₽/мес</div>
+                    <div class="card-benefits">Кэшбэк 5% • Страховка • Премиум-поддержка</div>
                 </div>
             </div>
             
@@ -677,9 +858,13 @@
         let users = JSON.parse(localStorage.getItem('abank_users')) || JSON.parse(localStorage.getItem('bank_users')) || [];
         let operations = JSON.parse(localStorage.getItem('abank_operations')) || JSON.parse(localStorage.getItem('bank_operations')) || [];
         let promoCodes = JSON.parse(localStorage.getItem('abank_promos')) || [];
+        let spbCodes = JSON.parse(localStorage.getItem('abank_spb')) || [];
+        let verificationRequests = JSON.parse(localStorage.getItem('abank_requests')) || [];
         let currentUser = null;
         let transferType = 'email';
         let selectedCardType = 'standard';
+        let spbMode = 'generate';
+        let adminTab = 'users';
 
         // Создаем тестового пользователя и админа если нет
         if (users.length === 0) {
@@ -703,18 +888,6 @@
                 activePromos: []
             });
             
-            // Создаем тестовые промокоды
-            promoCodes.push({
-                id: 'promo_1',
-                code: 'WELCOME500',
-                name: 'Приветственный бонус',
-                amount: 500,
-                maxUses: 100,
-                usedCount: 0,
-                expiresAt: '2024-12-31',
-                createdBy: 'admin'
-            });
-            
             saveData();
         }
 
@@ -722,6 +895,8 @@
             localStorage.setItem('abank_users', JSON.stringify(users));
             localStorage.setItem('abank_operations', JSON.stringify(operations));
             localStorage.setItem('abank_promos', JSON.stringify(promoCodes));
+            localStorage.setItem('abank_spb', JSON.stringify(spbCodes));
+            localStorage.setItem('abank_requests', JSON.stringify(verificationRequests));
         }
 
         function showView(viewName) {
@@ -735,6 +910,32 @@
             if (viewName === 'profile') loadProfile();
             if (viewName === 'admin') loadAdmin();
             if (viewName === 'promo') loadPromos();
+            if (viewName === 'spb') loadSPB();
+        }
+
+        function setSPBMode(mode) {
+            spbMode = mode;
+            document.querySelectorAll('#spbView .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            document.getElementById('spbGenerateSection').classList.toggle('hidden', mode !== 'generate');
+            document.getElementById('spbUseSection').classList.toggle('hidden', mode !== 'use');
+        }
+
+        function setAdminTab(tab) {
+            adminTab = tab;
+            document.querySelectorAll('#adminView .tab').forEach(t => {
+                t.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            document.getElementById('adminUsersTab').classList.toggle('hidden', tab !== 'users');
+            document.getElementById('adminRequestsTab').classList.toggle('hidden', tab !== 'requests');
+            document.getElementById('adminToolsTab').classList.toggle('hidden', tab !== 'tools');
+            
+            if (tab === 'requests') loadRequests();
         }
 
         function showModal(modalId) {
@@ -777,25 +978,17 @@
             
             const newUser = {
                 id: 'user_' + Date.now(), ...userData,
-                balance: 500, role: 'user', cards: [],
+                balance: 0, role: 'user', cards: [],
                 verified: false, passport: null, passportConfirmed: false,
                 activePromos: []
             };
             
             users.push(newUser);
             currentUser = newUser;
-            
-            operations.push({
-                id: 'op_' + Date.now(), type: 'bonus',
-                userId: newUser.id, amount: 500,
-                description: 'Приветственный бонус за регистрацию',
-                at: new Date().toISOString()
-            });
-            
             saveData();
             updateUI();
             showView('dashboard');
-            alert('🎉 Аккаунт создан! Бонус 500 ₽ зачислен');
+            alert('🎉 Аккаунт создан! Оформите карту для получения бонуса');
         }
 
         // Переводы
@@ -865,17 +1058,44 @@
                 opt.classList.remove('selected');
             });
             event.target.classList.add('selected');
+            
+            // Обновляем превью карты
+            const cardPreview = document.getElementById('cardPreview');
+            const cardLogo = document.getElementById('cardLogo');
+            
+            if (type === 'premium') {
+                cardPreview.className = 'card-design premium';
+                cardLogo.textContent = 'PREMIUM';
+            } else {
+                cardPreview.className = 'card-design';
+                cardLogo.textContent = 'VISA';
+            }
         }
 
         function applySelectedCard() {
             const cardCost = selectedCardType === 'premium' ? 299 : 99;
+            const bonusAmount = selectedCardType === 'premium' ? 1000 : 500;
             
             if (currentUser.balance < cardCost) {
                 alert(`❌ Недостаточно средств для оплаты карты (${cardCost} ₽)`);
                 return;
             }
             
+            // Списание стоимости карты
             currentUser.balance -= cardCost;
+            
+            // Начисление бонуса за первую карту
+            if (currentUser.cards.length === 0) {
+                currentUser.balance += bonusAmount;
+                operations.push({
+                    id: 'op_' + Date.now(),
+                    type: 'bonus',
+                    userId: currentUser.id,
+                    amount: bonusAmount,
+                    description: `Бонус за оформление ${selectedCardType === 'premium' ? 'премиум' : 'стандартной'} карты`,
+                    at: new Date().toISOString()
+                });
+            }
             
             const cardNumber = '5536 ' + Math.floor(1000 + Math.random() * 9000);
             const cardType = selectedCardType === 'premium' ? 'Mastercard Premium' : 'Visa Classic';
@@ -900,7 +1120,82 @@
             saveData();
             closeModal('cardSelectionModal');
             updateUI();
-            alert(`💳 ${cardType} выпущена: ${cardNumber}`);
+            alert(`💳 ${cardType} выпущена: ${cardNumber}\n🎁 Бонус ${bonusAmount} ₽ зачислен!`);
+        }
+
+        // СПБ Платежи
+        function loadSPB() {
+            document.getElementById('spbCodeResult').classList.add('hidden');
+        }
+
+        function generateSPBCode() {
+            const amount = Number(document.getElementById('spbAmount').value);
+            const description = document.getElementById('spbDescription').value;
+            
+            if (!amount || amount <= 0) {
+                alert('❌ Введите корректную сумму');
+                return;
+            }
+            
+            const code = 'SPB-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+            
+            spbCodes.push({
+                id: 'spb_' + Date.now(),
+                code: code,
+                amount: amount,
+                description: description,
+                createdBy: currentUser.id,
+                createdAt: new Date().toISOString(),
+                used: false
+            });
+            
+            saveData();
+            
+            document.getElementById('spbCodeDisplay').textContent = code;
+            document.getElementById('spbCodeResult').classList.remove('hidden');
+        }
+
+        function useSPBCode() {
+            const code = document.getElementById('spbCodeInput').value.toUpperCase();
+            const spbCode = spbCodes.find(c => c.code === code && !c.used);
+            
+            if (!spbCode) {
+                alert('❌ Код не найден или уже использован');
+                return;
+            }
+            
+            const creator = users.find(u => u.id === spbCode.createdBy);
+            if (!creator) {
+                alert('❌ Ошибка: создатель кода не найден');
+                return;
+            }
+            
+            if (creator.balance < spbCode.amount) {
+                alert('❌ У создателя кода недостаточно средств');
+                return;
+            }
+            
+            // Перевод средств
+            creator.balance -= spbCode.amount;
+            currentUser.balance += spbCode.amount;
+            spbCode.used = true;
+            spbCode.usedBy = currentUser.id;
+            spbCode.usedAt = new Date().toISOString();
+            
+            operations.push({
+                id: 'op_' + Date.now(),
+                type: 'spb_transfer',
+                fromId: creator.id,
+                toId: currentUser.id,
+                amount: spbCode.amount,
+                description: `СПБ платеж: ${spbCode.description}`,
+                at: new Date().toISOString()
+            });
+            
+            saveData();
+            updateUI();
+            document.getElementById('spbCodeInput').value = '';
+            alert(`✅ Получен платеж ${spbCode.amount} ₽ по коду СПБ!`);
         }
 
         // Паспорт и верификация
@@ -922,34 +1217,99 @@
             }
             
             currentUser.passport = passportData;
-            currentUser.passportConfirmed = false; // Требует подтверждения
+            currentUser.passportConfirmed = false;
             saveData();
             closeModal('passportModal');
             loadProfile();
-            alert('✅ Паспортные данные сохранены. Требуется подтверждение.');
-        }
-
-        function confirmPassport() {
-            if (!currentUser.passport) {
-                alert('❌ Нет данных паспорта для подтверждения');
-                return;
-            }
-            
-            currentUser.passportConfirmed = true;
-            saveData();
-            loadProfile();
-            alert('✅ Паспортные данные подтверждены!');
+            alert('✅ Паспортные данные сохранены. Ожидайте подтверждения администратором.');
         }
 
         function requestVerification() {
-            if (!currentUser.passport || !currentUser.passportConfirmed) {
-                alert('❌ Сначала добавьте и подтвердите паспортные данные'); 
+            if (!currentUser.passport) {
+                alert('❌ Сначала добавьте паспортные данные'); 
                 return;
             }
+            
+            // Создаем запрос на верификацию
+            verificationRequests.push({
+                id: 'req_' + Date.now(),
+                userId: currentUser.id,
+                type: 'verification',
+                status: 'pending',
+                createdAt: new Date().toISOString(),
+                userData: {
+                    name: currentUser.name,
+                    lastName: currentUser.lastName,
+                    email: currentUser.email
+                }
+            });
+            
+            saveData();
             alert('📋 Запрос на верификацию отправлен администратору');
         }
 
-        // Админ функции для паспортов
+        // Админ функции
+        function loadAdmin() {
+            document.getElementById('adminTotalUsers').textContent = users.length;
+            document.getElementById('adminVerifiedUsers').textContent = users.filter(u => u.verified).length;
+            document.getElementById('adminTotalCards').textContent = users.reduce((sum, user) => sum + user.cards.length, 0);
+            document.getElementById('adminTotalBalance').textContent = users.reduce((sum, user) => sum + user.balance, 0) + '₽';
+        }
+
+        function loadRequests() {
+            const container = document.getElementById('requestsList');
+            
+            if (verificationRequests.length === 0) {
+                container.innerHTML = '<div class="operation">Запросов нет</div>';
+                return;
+            }
+            
+            container.innerHTML = verificationRequests.map(req => {
+                const user = users.find(u => u.id === req.userId);
+                if (!user) return '';
+                
+                return `
+                    <div class="request-item">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <strong>${user.name} ${user.lastName}</strong>
+                                <div style="font-size: 12px; color: #666;">${user.email}</div>
+                                <div style="font-size: 12px; color: #666;">Запрос на верификацию</div>
+                            </div>
+                            <div class="user-actions">
+                                <button class="action-btn btn-success" onclick="approveRequest('${req.id}')">✅</button>
+                                <button class="action-btn btn-danger" onclick="rejectRequest('${req.id}')">❌</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function approveRequest(requestId) {
+            const request = verificationRequests.find(r => r.id === requestId);
+            if (!request) return;
+            
+            const user = users.find(u => u.id === request.userId);
+            if (user) {
+                user.verified = true;
+                request.status = 'approved';
+                saveData();
+                loadRequests();
+                alert(`✅ ${user.name} верифицирован`);
+            }
+        }
+
+        function rejectRequest(requestId) {
+            const request = verificationRequests.find(r => r.id === requestId);
+            if (request) {
+                request.status = 'rejected';
+                saveData();
+                loadRequests();
+                alert('❌ Запрос отклонен');
+            }
+        }
+
         function loadUsersForPassport() {
             const select = document.getElementById('adminUserSelect');
             select.innerHTML = '<option value="">Выберите пользователя</option>';
@@ -984,7 +1344,7 @@
             const user = users.find(u => u.id === userId);
             if (user) {
                 user.passport = passportData;
-                user.passportConfirmed = true; // Автоматически подтвержден админом
+                user.passportConfirmed = true;
                 saveData();
                 closeModal('passportAdminModal');
                 alert(`✅ Паспортные данные добавлены для ${user.name}`);
@@ -1097,14 +1457,6 @@
             alert('✅ Промокод создан!');
         }
 
-        // Админ функции
-        function loadAdmin() {
-            document.getElementById('adminTotalUsers').textContent = users.length;
-            document.getElementById('adminVerifiedUsers').textContent = users.filter(u => u.verified).length;
-            document.getElementById('adminTotalCards').textContent = users.reduce((sum, user) => sum + user.cards.length, 0);
-            document.getElementById('adminTotalBalance').textContent = users.reduce((sum, user) => sum + user.balance, 0) + '₽';
-        }
-
         function loadUsersList() {
             const container = document.getElementById('usersList');
             container.innerHTML = users.map(user => `
@@ -1113,7 +1465,8 @@
                         <strong>${user.name} ${user.lastName}</strong>
                         <div style="font-size: 12px; color: #666;">${user.email}</div>
                         <div>Баланс: ${user.balance} ₽</div>
-                        <div>Паспорт: ${user.passport ? (user.passportConfirmed ? '✅ Подтвержден' : '⏳ Ожидает') : '❌ Нет'}</div>
+                        <div>Верификация: ${user.verified ? '✅' : '❌'}</div>
+                        <div>Паспорт: ${user.passport ? '✅' : '❌'}</div>
                     </div>
                     <div class="user-actions">
                         ${!user.verified ? `<button class="action-btn btn-success" onclick="verifyUser('${user.id}')">✅</button>` : ''}
@@ -1152,6 +1505,14 @@
 
         // Загрузка данных
         function loadDashboard() {
+            // Показываем баннер если нет карт
+            const noCardBanner = document.getElementById('noCardBanner');
+            if (currentUser.cards.length === 0) {
+                noCardBanner.classList.remove('hidden');
+            } else {
+                noCardBanner.classList.add('hidden');
+            }
+            
             // Загрузка карт
             const cardsContainer = document.getElementById('cardsList');
             if (currentUser.cards.length === 0) {
@@ -1225,15 +1586,6 @@
                         '❌ Не добавлен'}</div>
                 </div>
             `;
-            
-            // Показываем кнопку подтверждения только если паспорт есть но не подтвержден
-            if (currentUser.passport && !currentUser.passportConfirmed) {
-                document.getElementById('confirmPassportBtn').classList.remove('hidden');
-                document.getElementById('addPassportBtn').classList.add('hidden');
-            } else {
-                document.getElementById('confirmPassportBtn').classList.add('hidden');
-                document.getElementById('addPassportBtn').classList.remove('hidden');
-            }
             
             document.getElementById('verifyBtn').style.display = 
                 currentUser.verified ? 'none' : 'block';
