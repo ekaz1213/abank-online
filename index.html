@@ -507,6 +507,27 @@
             margin: 15px 0;
         }
         
+        .subscription-item {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 4px solid #10b981;
+        }
+        
+        .subscription-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: #10b981;
+            margin: 10px 0;
+        }
+        
+        .subscription-description {
+            color: #64748b;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
         @media (max-width: 480px) {
             .content {
                 padding: 20px;
@@ -541,7 +562,7 @@
     <div class="app">
         <div class="header">
             <div class="logo">А БАНК</div>
-            <div class="subtitle">Премиум Банкинг</div>
+            <div class="subtitle">Премиум Банкинг + СБП Платежи</div>
         </div>
         
         <div class="content">
@@ -553,6 +574,14 @@
                     <input type="password" id="loginPassword" placeholder="Пароль" value="user123">
                     <button onclick="login()">🔐 Войти в систему</button>
                     <button class="btn-secondary" onclick="showView('register')">✨ Создать аккаунт</button>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: #f0f4ff; border-radius: 12px;">
+                        <h4 style="margin-bottom: 10px;">Тестовые аккаунты:</h4>
+                        <div style="font-size: 14px; color: #64748b;">
+                            <div><strong>Обычный пользователь:</strong> user@example.com / user123</div>
+                            <div><strong>Администратор:</strong> admin@abank.ru / Admin123!</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -654,6 +683,7 @@
                     <div class="tabs">
                         <div class="tab active" onclick="setSPBMode('generate')">🎫 Создать код</div>
                         <div class="tab" onclick="setSPBMode('use')">💳 Использовать код</div>
+                        <div class="tab" onclick="setSPBMode('subscriptions')">🛒 Подписки/Товары</div>
                     </div>
                     
                     <div id="spbGenerateSection">
@@ -671,6 +701,14 @@
                     <div id="spbUseSection" class="hidden">
                         <input type="text" id="spbCodeInput" placeholder="Введите код СПБ">
                         <button onclick="useSPBCode()">💸 Получить платеж</button>
+                    </div>
+                    
+                    <div id="spbSubscriptionsSection" class="hidden">
+                        <h4 style="margin-bottom: 15px;">Доступные подписки и товары</h4>
+                        <div id="subscriptionsList">
+                            <!-- Подписки будут загружены динамически -->
+                        </div>
+                        <button onclick="showModal('createSubscriptionModal')" class="btn-success">➕ Создать предложение</button>
                     </div>
                     
                     <button class="btn-secondary" onclick="showView('dashboard')">← Назад</button>
@@ -853,6 +891,19 @@
         </div>
     </div>
 
+    <div class="modal" id="createSubscriptionModal">
+        <div class="modal-content">
+            <h3 style="text-align: center; margin-bottom: 20px;">🛒 Создать предложение</h3>
+            <input type="text" id="subscriptionName" placeholder="Название товара/подписки">
+            <input type="number" id="subscriptionPrice" placeholder="Цена">
+            <textarea id="subscriptionDescription" placeholder="Описание" rows="3"></textarea>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="createSubscription()">✨ Создать предложение</button>
+                <button class="btn-secondary" onclick="closeModal('createSubscriptionModal')">❌ Отмена</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // База данных с совместимостью
         let users = JSON.parse(localStorage.getItem('abank_users')) || JSON.parse(localStorage.getItem('bank_users')) || [];
@@ -860,6 +911,7 @@
         let promoCodes = JSON.parse(localStorage.getItem('abank_promos')) || [];
         let spbCodes = JSON.parse(localStorage.getItem('abank_spb')) || [];
         let verificationRequests = JSON.parse(localStorage.getItem('abank_requests')) || [];
+        let subscriptions = JSON.parse(localStorage.getItem('abank_subscriptions')) || [];
         let currentUser = null;
         let transferType = 'email';
         let selectedCardType = 'standard';
@@ -888,6 +940,29 @@
                 activePromos: []
             });
             
+            // Создаем тестовые подписки
+            subscriptions.push({
+                id: 'sub_1',
+                name: 'Премиум подписка на музыку',
+                price: 299,
+                description: 'Доступ к миллионам треков без рекламы',
+                createdBy: 'admin',
+                createdAt: new Date().toISOString(),
+                active: true,
+                salesCount: 0
+            });
+            
+            subscriptions.push({
+                id: 'sub_2',
+                name: 'Годовой курс программирования',
+                price: 15000,
+                description: 'Полный курс по веб-разработке с поддержкой ментора',
+                createdBy: 'admin',
+                createdAt: new Date().toISOString(),
+                active: true,
+                salesCount: 0
+            });
+            
             saveData();
         }
 
@@ -897,6 +972,7 @@
             localStorage.setItem('abank_promos', JSON.stringify(promoCodes));
             localStorage.setItem('abank_spb', JSON.stringify(spbCodes));
             localStorage.setItem('abank_requests', JSON.stringify(verificationRequests));
+            localStorage.setItem('abank_subscriptions', JSON.stringify(subscriptions));
         }
 
         function showView(viewName) {
@@ -922,6 +998,9 @@
             
             document.getElementById('spbGenerateSection').classList.toggle('hidden', mode !== 'generate');
             document.getElementById('spbUseSection').classList.toggle('hidden', mode !== 'use');
+            document.getElementById('spbSubscriptionsSection').classList.toggle('hidden', mode !== 'subscriptions');
+            
+            if (mode === 'subscriptions') loadSubscriptions();
         }
 
         function setAdminTab(tab) {
@@ -1196,6 +1275,95 @@
             updateUI();
             document.getElementById('spbCodeInput').value = '';
             alert(`✅ Получен платеж ${spbCode.amount} ₽ по коду СПБ!`);
+        }
+
+        // Подписки и товары
+        function loadSubscriptions() {
+            const container = document.getElementById('subscriptionsList');
+            const activeSubscriptions = subscriptions.filter(s => s.active);
+            
+            if (activeSubscriptions.length === 0) {
+                container.innerHTML = '<div class="operation">Предложений пока нет</div>';
+                return;
+            }
+            
+            container.innerHTML = activeSubscriptions.map(sub => `
+                <div class="subscription-item">
+                    <h4>${sub.name}</h4>
+                    <div class="subscription-price">${sub.price} ₽</div>
+                    <div class="subscription-description">${sub.description}</div>
+                    <button onclick="buySubscription('${sub.id}')" style="width: auto; padding: 10px 20px;">
+                        🛒 Купить
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function createSubscription() {
+            const name = document.getElementById('subscriptionName').value;
+            const price = Number(document.getElementById('subscriptionPrice').value);
+            const description = document.getElementById('subscriptionDescription').value;
+            
+            if (!name || !price || !description) {
+                alert('❌ Заполните все поля');
+                return;
+            }
+            
+            const newSubscription = {
+                id: 'sub_' + Date.now(),
+                name: name,
+                price: price,
+                description: description,
+                createdBy: currentUser.id,
+                createdAt: new Date().toISOString(),
+                active: true,
+                salesCount: 0
+            };
+            
+            subscriptions.push(newSubscription);
+            saveData();
+            closeModal('createSubscriptionModal');
+            loadSubscriptions();
+            alert('✅ Предложение создано!');
+        }
+
+        function buySubscription(subscriptionId) {
+            const subscription = subscriptions.find(s => s.id === subscriptionId);
+            if (!subscription) return;
+            
+            if (currentUser.balance < subscription.price) {
+                alert('❌ Недостаточно средств для покупки');
+                return;
+            }
+            
+            // Создаем код СПБ для покупки
+            const code = 'SPB-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+            
+            spbCodes.push({
+                id: 'spb_' + Date.now(),
+                code: code,
+                amount: subscription.price,
+                description: `Покупка: ${subscription.name}`,
+                createdBy: currentUser.id,
+                createdAt: new Date().toISOString(),
+                used: false,
+                subscriptionId: subscriptionId
+            });
+            
+            // Списание средств
+            currentUser.balance -= subscription.price;
+            
+            operations.push({
+                id: 'op_' + Date.now(),
+                type: 'subscription_purchase',
+                userId: currentUser.id,
+                amount: -subscription.price,
+                description: `Покупка: ${subscription.name}`,
+                at: new Date().toISOString()
+            });
+            
+            saveData();
+            alert(`✅ Создан код СПБ для покупки: ${code}\nПокажите его продавцу для получения товара`);
         }
 
         // Паспорт и верификация
